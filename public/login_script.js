@@ -1,4 +1,81 @@
-//////////////// Skrypty do strony logowania //////////////
+let currentForm = 'login'; // Domyślny tryb to logowanie
+
+function updateTitle(title) {
+    document.getElementById("formTitle").innerText = title;
+}
+
+function renderLoginForm() {
+    const form = document.getElementById("userForm");
+    form.innerHTML = `
+                <input type="text" name="username" id="username" placeholder="Nazwa użytkownika" required /><br><br>
+                <input type="password" name="password" id="password" placeholder="Hasło" required /><br><br>
+                <button type="button" onclick="handleLoginClick()">Zaloguj się</button>
+                <button type="button" onclick="handleRegisterClick()">Zarejestruj się</button>
+            `;
+    updateTitle("Logowanie");
+    currentForm = 'login';
+}
+
+function renderRegisterForm() {
+    const form = document.getElementById("userForm");
+    form.innerHTML = `
+                <input type="text" name="username" id="username" placeholder="Nazwa użytkownika" required /><br><br>
+                <input type="password" name="password" id="password" placeholder="Hasło" required /><br><br>
+                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Powtórz hasło" required /><br><br>
+                <div class="optional-section">
+
+                    <h3>Dane opcjonalne</h3>
+                    <input type="date" name="birthdate" id="birthdate" placeholder="Data urodzenia" /><br><br>
+                    <input type="number" name="height" id="height" placeholder="Wzrost (cm)" min="1" /><br><br>
+                    <input type="number" name="weight" id="weight" placeholder="Waga (kg)" min="1" /><br><br>
+
+                    <select name="gender" id="gender">
+                        <option value="">Płeć</option>
+                        <option value="female">Kobieta</option>
+                        <option value="male">Mężczyzna</option>
+                        <option value="nonbinary">Niebinarna</option>
+                    </select><br><br>
+
+                    <select name="activityLevel" id="activityLevel">
+                        <option value="">Poziom aktywności</option>
+                        <option value="sedentary">Siedzący tryb życia</option>
+                        <option value="light">Lekka aktywność</option>
+                        <option value="moderate">Umiarkowana aktywność</option>
+                        <option value="active">Duża aktywność</option>
+                        <option value="very_active">Bardzo duża aktywność</option>
+                    </select><br><br>
+
+                    <select name="goal" id="goal">
+                        <option value="">Cel</option>
+                        <option value="lose">Schudnąć</option>
+                        <option value="maintain">Utrzymać wagę</option>
+                        <option value="gain">Przytyć</option>
+                    </select><br><br>
+
+                </div><br>
+
+                <button type="button" onclick="handleLoginClick()">Zaloguj się</button>
+                <button type="button" onclick="handleRegisterClick()">Zarejestruj się</button>
+            `;
+    updateTitle("Rejestracja");
+    currentForm = 'register';
+}
+
+function handleLoginClick() {
+    if (currentForm === 'login') {
+        Login();
+    } else {
+        renderLoginForm();
+    }
+}
+
+function handleRegisterClick() {
+    if (currentForm === 'register') {
+        Register();
+    } else {
+        renderRegisterForm();
+    }
+}
 
 async function forLoginPage() {
     user = await loggedUser();
@@ -12,11 +89,19 @@ async function forLoginPage() {
 async function Login() {
     const form = document.getElementById('userForm');
     const message = document.getElementById('message');
-
     const formData = new FormData(form);
+
+    const username = (formData.get('username') || '').trim();
+    const password = (formData.get('password') || '').trim();
+
+    if (username === '' || password === '') {
+        message.innerHTML = "Brakujące dane";
+        return;
+    }
+
     const data = {
-        username: formData.get('username'),
-        password: formData.get('password')
+        username: username,
+        password: password
     };
 
     const res = await fetch(`/api/login`, {
@@ -25,7 +110,7 @@ async function Login() {
         body: JSON.stringify(data)
     });
 
-    if (res.status === 201) {
+    if (res.ok) {
         message.innerHTML = "Zalogowano";
         forLoginPage();
         form.reset();
@@ -35,7 +120,7 @@ async function Login() {
         form.reset();
     }
     if (res.status === 400) {
-        message.innerHTML = "Niekompletne dane";
+        message.innerHTML = "Niepoprawne dane";
     }
 }
 
@@ -43,12 +128,96 @@ async function Login() {
 async function Register() {
     const form = document.getElementById('userForm');
     const message = document.getElementById('message');
-
     const formData = new FormData(form);
+
+    // Usuwanie niepotrzebnych spacji, tabulatorow itd.
+    const username = (formData.get('username') || '').trim();
+    const password = (formData.get('password') || '').trim();
+    const confirmPassword = (formData.get('confirmPassword') || '').trim();
+    const birthdate = (formData.get('birthdate') || '').trim();
+    const height = formData.get('height');
+    const weight = formData.get('weight');
+    const gender = (formData.get('gender') || '').trim();
+    const activityLevel = (formData.get('activityLevel') || '').trim();
+    const goal = (formData.get('goal') || '').trim();
+
+    // Sprawdzenie czy dane nie sa puste
+    if (username === '' || password === '' || confirmPassword === '') {
+        message.innerHTML = "Brakujące dane";
+        return;
+    }
+
+    // Sprawdzenie zgodności haseł
+    if (password !== confirmPassword) {
+        message.innerHTML = "Hasła nie są takie same";
+        return;
+    }
+
+    // Walidacja długości hasła
+    if (password.length < 8) {
+        message.innerHTML = "Hasło musi mieć co najmniej 8 znaków";
+        return;
+    }
+
+    // Walidacja dużej litery
+    if (!/[A-Z]/.test(password)) {
+        message.innerHTML = "Hasło musi zawierać co najmniej jedną dużą literę";
+        return;
+    }
+
+    // Walidacja cyfry
+    if (!/\d/.test(password)) {
+        message.innerHTML = "Hasło musi zawierać co najmniej jedną cyfrę";
+        return;
+    }
+
+    // Walidacja daty urodzenia
+    if (birthdate !== '') {
+        const today = new Date().toISOString().split('T')[0]; // dzisiejsza data w formacie YYYY-MM-DD
+        if (birthdate > today) {
+            message.innerHTML = "Data urodzenia nie może być z przyszłości";
+            return;
+        }
+    }
+
+    if (height && (isNaN(height) || height <= 0)) {
+        message.innerHTML = "Wzrost musi być dodatnią liczbą";
+        return;
+    }
+
+    if (weight && (isNaN(weight) || weight <= 0)) {
+        message.innerHTML = "Waga musi być dodatnią liczbą";
+        return;
+    }
+
+    if (gender !== '')
+        if (!["female", "male", "nonbinary"].includes(gender)) {
+            message.innerHTML = "Nieprawidłowa wartość pola płeć";
+            return;
+        }
+
+    if (activityLevel !== '')
+        if (!["sedentary", "light", "moderate", "active", "very_active"].includes(activityLevel)) {
+            message.innerHTML = "Nieprawidłowa wartość pola poziom aktywności";
+            return;
+        }
+
+    if (goal !== '')
+        if (!["lose", "maintain", "gain"].includes(goal)) {
+            message.innerHTML = "Nieprawidłowa wartość pola cel";
+            return;
+        }
+
     const data = {
-        username: formData.get('username'),
-        password: formData.get('password'),
-        birthdate: formData.get('birthdate')
+        username: username,
+        password: password,
+        confirmPassword: confirmPassword,
+        birthdate: birthdate,
+        height: height ? parseFloat(height) : null,
+        weight: weight ? parseFloat(weight) : null,
+        gender: gender,
+        activityLevel: activityLevel,
+        goal: goal
     };
 
     const res = await fetch(`/api/register`, {
@@ -57,7 +226,7 @@ async function Register() {
         body: JSON.stringify(data)
     });
 
-    if (res.status === 201) {
+    if (res.ok) {
         message.innerHTML = "Zarejestrowano";
         form.reset();
     }
@@ -66,129 +235,9 @@ async function Register() {
         form.reset();
     }
     if (res.status === 400) {
-        message.innerHTML = "Niekompletne dane";
+        message.innerHTML = "Niepoprawne dane";
     }
 }
-
-// Wylogowanie
-async function logout() {
-    await fetch('/api/logout', { method: 'POST' });
-    location.reload();
-}
-
-
-/////////////// Skrypty do strony glownej ///////////////
-
-async function forMainPage() {
-    user = await loggedUser();
-    if (!user) return;
-
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) loginButton.innerHTML = `<button onclick="logout()">Wyloguj</button>`;
-
-    const profileButton = document.getElementById('profileButton');
-    if (profileButton) profileButton.style.display = 'inline-block';
-
-    if (user.role === 'admin') {
-        const adminButton = document.getElementById('adminButton');
-        if (adminButton) adminButton.style.display = 'inline-block';
-    }
-}
-
-
-/////////////// Skrypty do strony admina ////////////////
-
-async function forAdminPage() {
-    user = await loggedUser();
-    if (!user) return;
-
-    loadUsers();
-}
-
-// Zwraca liste zarejestrowanych uzytkownikow
-async function loadUsers() {
-    const userList = document.getElementById('userList');
-    if (userList) {
-        const res = await fetch('/api/users');
-        const users = await res.json();
-        userList.innerHTML = users.map(u => `
-        <p>
-            User #${u.id}: ${u.username} ${u.birthdate} ${u.role}
-            <button onclick="deleteUser(${u.id})">Usuń</button>
-            <button onclick="toggleRole(${u.id})">Zmień rolę</button>
-        </p>
-    `).join('');
-    }
-}
-
-// Usuwanie
-async function deleteUser(id) {
-    const confirmed = confirm("Czy na pewno chcesz usunąć użytkownika?");
-    if (!confirmed) return;
-
-    const res = await fetch(`/api/user/${id}`, { method: 'DELETE' });
-
-    if (res.ok) {
-        alert("Użytkownik usunięty");
-        loadUsers();
-    } else {
-        alert("Błąd");
-    }
-}
-
-// Zmiana roli
-async function toggleRole(id) {
-    const res = await fetch(`/api/user/role/${id}`, { method: 'PUT' });
-
-    if (res.ok) {
-        alert("Zmieniono role");
-        loadUsers();
-    } else {
-        alert("Błąd");
-    }
-}
-
-
-///////////////// Skrypty do strony profilu ////////////////
-
-async function forProfilePage() {
-    user = await loggedUser();
-    if (!user) return;
-
-    const currentUsername = document.getElementById('currentUsername');
-    if (currentUsername) currentUsername.textContent = user.username;
-
-    const roleInfo = document.getElementById('role');
-    if (roleInfo) roleInfo.textContent = user.role;
-
-    const currentBirthdate = document.getElementById('currentBirthdate');
-    if (currentBirthdate) currentBirthdate.textContent = user.birthdate;
-}
-
-async function changeUsername() {
-    const newUsername = document.getElementById('newUsername').value;
-
-    user = await loggedUser();
-    if (!user) return;
-
-    const res = await fetch(`/api/user/username/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newusername: newUsername })
-    });
-
-    if (res.ok) {
-        alert("Zmieniono nazwę użytkownika");
-        forProfilePage();
-        newUsername.value = '';
-        document.getElementById('usernameForm').style.display = 'none';
-    }
-    if (res.status === 409) {
-        alert("Nazwa użytkownika jest zajęta");
-    }
-}
-
-
 
 // Sprawdza czy uzytkownik jest juz zalogowany
 async function loggedUser() {
@@ -197,3 +246,7 @@ async function loggedUser() {
     const user = await res.json();
     return user;
 }
+
+window.onload = () => {
+    forLoginPage();
+};
