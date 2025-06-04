@@ -183,17 +183,6 @@
                     <p>Formularz do dodawania komentarza.</p>
                 </div>
             `;
-            document.getElementById('loginButton').style.display = 'none';
-        }
-
-        function showKcalCounter() {
-            const main = document.querySelector('main');
-            main.innerHTML = `
-                <div class="box">
-                    <h2>Oblicz Kalorie</h2>
-                    <p>Formularz do obliczania kalorii.</p>
-                </div>
-            `;
         }
 
         function showRecipes() {
@@ -219,6 +208,36 @@
             `;
         }
 
+        async function forMainPage() {
+            user = await loggedUser();
+            if (!user) return;
+
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) loginButton.innerHTML = `<button onclick="logout()">Wyloguj</button>`;
+
+            const profileButton = document.getElementById('profileButton');
+            if (profileButton) profileButton.style.display = 'inline-block';
+
+            if (user.role === 'admin') {
+                const adminButton = document.getElementById('adminButton');
+                if (adminButton) adminButton.style.display = 'inline-block';
+            }
+        }
+
+        // Sprawdza czy uzytkownik jest juz zalogowany
+        async function loggedUser() {
+            const res = await fetch('/api/me', { credentials: 'include' });
+            if (!res.ok) return false;
+            const user = await res.json();
+            return user;
+        }
+
+        // Wylogowanie
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            location.reload();
+        }
+
         window.onload = () => {
             forMainPage();
         };
@@ -232,11 +251,11 @@
     <div id="profileButton"><button onclick="location.href='profile.html'">Profil</button></div>
     <header onclick="returnToMainMenu()">
         <h1><span>Fit</span>App</h1>
-        <img src="logo.png" alt="Logo"> <!-- Dodano logo -->
+        <img src="/public/logo.png" alt="Logo"> <!-- Dodano logo -->
     </header>
     <nav>
         <a href="#" onclick="showBlogContent()">Blog</a>
-        <a href="#" onclick="showKcalCounter()">Licznik Kcal</a>
+        <a href="licznik.html">Licznik BMR</a>
         <a href="#" onclick="showRecipes()">Przepisy</a>
     </nav>
     <main>
@@ -248,7 +267,6 @@
     <div class="banner" onclick="returnToMainMenu()">
         FitApp
     </div>
-    <script src="/public/login_script.js"></script>
 </body>
 
 </html>
