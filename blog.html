@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FitApp Blog z Asystentem</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 2em;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .container {
+      display: flex;
+      flex: 1 1 auto;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 10px 0;
+      gap: 10px;
+      height: calc(100vh - 80px);
+      overflow: hidden;
+    }
+
+    /* Reklamy pionowe */
+    .ad {
+      width: 80px;
+      background: #ffd966;
+      border: 3px dashed #f39c12;
+      border-radius: 8px;
+      color: #6e5700;
+      font-weight: bold;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      font-size: 0.9em;
+      user-select: none;
+      cursor: default;
+    }
+    .ad.left {
+      margin-left: 5px;
+    }
+    .ad.right {
+      margin-right: 5px;
+    }
+
+    /* Reklamy po bokach – szersze i poziomy tekst */
+    .ad-left, .ad-right {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100px;          /* zwiększona szerokość */
+      height: 250px;         /* dopasowana wysokość */
+      background: #ddd;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #555;
+      text-align: center;
+      padding: 10px;
+      box-sizing: border-box;
+      writing-mode: horizontal-tb; /* standardowy poziomy tekst */
+      user-select: none;
+      z-index: 2000;
+    }
+
+    .ad-left {
+      left: 0;
+    }
+
+    .ad-right {
+      right: 0;
+    }
+
+    @media (max-width: 1200px) {
+      .ad-left, .ad-right {
+        display: none;
+      }
+    }
+
+    /* Główna zawartość i sidebar */
+    .sidebar-left {
+      width: 180px;
+      background-color: #fff;
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-y: auto;
+    }
+    .sidebar-left h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+    .sidebar-left ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-left li {
+      padding: 7px 0;
+      cursor: pointer;
+      color: #333;
+      user-select: none;
+      border-bottom: 1px solid #ddd;
+      transition: color 0.3s;
+    }
+    .sidebar-left li:hover {
+      color: #4caf50;
+    }
+
+    .main {
+      flex-grow: 1;
+      background-color: #fff;
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .post {
+      border: 1px solid #4caf50;
+      border-radius: 8px;
+      padding: 12px 15px;
+      background: #f0f9f4;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .post-title {
+      font-size: 1.3em;
+      margin: 0;
+      color: #2e7d32;
+      flex-grow: 1;
+    }
+    .post-info {
+      font-size: 0.85em;
+      color: #666;
+      white-space: nowrap;
+    }
+    .post-content {
+      margin: 10px 0;
+      font-size: 1em;
+      color: #333;
+    }
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      font-size: 0.9em;
+      color: #444;
+    }
+    .post-actions button {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #4caf50;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    .post-actions button.dislike {
+      color: #e74c3c;
+    }
+    .post-actions button:hover {
+      opacity: 0.7;
+    }
+
+    .comments {
+      margin-top: 10px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+    .comment {
+      border-radius: 5px;
+      background-color: #eaf4ea;
+      margin-bottom: 8px;
+      padding: 7px 10px;
+      font-size: 0.9em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .comment-text {
+      max-width: 85%;
+      white-space: pre-wrap;
+    }
+    .comment-actions {
+      display: flex;
+      gap: 8px;
+      font-size: 0.8em;
+      color: #4caf50;
+      cursor: pointer;
+      user-select: none;
+    }
+    .comment-actions.dislike {
+      color: #e74c3c;
+    }
+    .comment-actions span:hover {
+      opacity: 0.7;
+    }
+
+    form.comment-form {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    form.comment-form textarea {
+      flex-grow: 1;
+      resize: vertical;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 0.95em;
+      min-height: 40px;
+      max-height: 100px;
+    }
+    form.comment-form button {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    form.comment-form button:hover {
+      background-color: #14a450;
+    }
+
+    /* Sidebar po prawej z trendami */
+    .sidebar-right {
+      width: 180px;
+      background-color: #fff;
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-y: auto;
+    }
+    .sidebar-right h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+    .sidebar-right ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-right li {
+      padding: 7px 0;
+      cursor: default;
+      color: #333;
+      border-bottom: 1px solid #ddd;
+      user-select: none;
+    }
+
+    /* Asystent w prawym dolnym rogu */
+    #assistant {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      width: 320px;
+      background: white;
+      border: 2px solid #4caf50;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgb(0 0 0 / 0.15);
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      transition: height 0.3s ease;
+      height: 40px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #assistant.expanded {
+      height: 280px;
+      cursor: default;
+    }
+
+    #assistant-header {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      font-weight: bold;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #assistant-header span {
+      cursor: pointer;
+      font-size: 1.2em;
+      line-height: 1;
+      user-select: none;
+    }
+
+    #assistant-content {
+      padding: 10px 15px;
+      flex-grow: 1;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #assistant.expanded #assistant-content {
+      display: flex;
+    }
+
+    #assistant textarea {
+      flex-grow: 1;
+      resize: vertical;
+      min-height: 100px;
+      max-height: 140px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 1em;
+    }
+    #assistant button {
+      background-color: #2ecc71;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+    #assistant button:hover {
+      background-color: #14a450;
+    }
+
+    /* Toasty */
+    #toast-container {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      z-index: 9999;
+    }
+
+    .toast {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      margin-top: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      animation: fadeInOut 4s ease forwards;
+      font-size: 0.95em;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(20px); }
+    }
+
+    /* Scrollbar */
+    .sidebar-left::-webkit-scrollbar,
+    .sidebar-right::-webkit-scrollbar,
+    .main::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar-left::-webkit-scrollbar-thumb,
+    .sidebar-right::-webkit-scrollbar-thumb,
+    .main::-webkit-scrollbar-thumb {
+      background: #4caf50;
+      border-radius: 3px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1000px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+      .sidebar-left, .sidebar-right {
+        width: 100%;
+        height: auto;
+        border: 2px solid #4caf50;
+        margin-bottom: 10px;
+      }
+      .ad {
+        display: none;
+      }
+      #assistant {
+        width: 95%;
+        right: 2.5%;
+        bottom: 70px;
+        height: 50px;
+      }
+      #assistant.expanded {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ad-left">Reklama po lewej stronie</div>
+<div class="ad-right">Reklama po prawej stronie</div>
+
+<div id="toast-container"></div> <!-- Dodaj to tutaj -->
+
+<header>FitApp Blog</header>
+
+<div class="container">
+
+  <div class="sidebar-left">
+    <h3>Tematyka</h3>
+    <ul>
+      <li>🏋️‍♂️ Siłownia</li>
+      <li>🥗 Dieta</li>
+      <li>🤸 Fitness</li>
+      <li>❤️‍🔥 Cardio</li>
+      <li>🛌 Regeneracja</li>
+    </ul>
+  </div>
+
+  <div class="main" id="posts-container">
+    <!-- Posty w JS -->
+  </div>
+
+  <div class="sidebar-right">
+    <h3>🔥 Trendy</h3>
+    <ul>
+      <li>#Dieta3xZ</li>
+      <li>#HIITczyHIT</li>
+      <li>#StretchingTikTok</li>
+      <li>#SpaDomowe</li>
+      <li>#FitnessNaKacu</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Asystent -->
+<div id="assistant" title="Kliknij, aby rozwinąć asystenta">
+  <div id="assistant-header">
+    <div>🤖 Asystent FitApp</div>
+    <span id="assistant-toggle">+</span>
+  </div>
+  <div id="assistant-content">
+    <textarea id="assistant-input" placeholder="Napisz problem lub pytanie..."></textarea>
+    <button id="assistant-send">Wyślij do eksperta</button>
+    <div id="assistant-response" style="margin-top:10px; font-size: 0.9em; color:#333;"></div>
+  </div>
+</div>
+
+<script>
+  const examplePosts = [
+    {
+      id: 1,
+      title: "🔥 5-minutowy trening na brzuch",
+      content: "Idealny poranny zestaw ćwiczeń: plank, scyzoryki i russian twist.",
+      author: "Marek Triceps",
+      date: "2025-06-01 08:15",
+      comments: [
+        {id: 1, text: "A gdzie przysiady? Bez nóg to nie trening 😤", likes: 0, dislikes: 0},
+        {id: 2, text: "Spisek producentów mat do ćwiczeń!", likes: 0, dislikes: 0}
+      ],
+      likes: 0,
+      dislikes: 0
+    },
+    {
+      id: 2,
+      title: "🥗 Zdrowe śniadanie na szybki start",
+      content: "Owsianka z owocami i orzechami – idealna dawka energii na cały dzień.",
+      author: "Anna Dietetyk",
+      date: "2025-06-02 07:30",
+      comments: [
+        {id: 1, text: "Pyszne i sycące!", likes: 0, dislikes: 0},
+        {id: 2, text: "Polecam dodać trochę cynamonu.", likes: 0, dislikes: 0}
+      ],
+      likes: 0,
+      dislikes: 0
+    },
+    {
+      id: 3,
+      title: "🤸 Jak poprawić mobilność stawów?",
+      content: "Regularne rozciąganie i rolowanie mięśni to klucz do zdrowia i sprawności.",
+      author: "Janek Fizjo",
+      date: "2025-06-03 09:00",
+      comments: [
+        {id: 1, text: "Fajny wpis, przyda się!", likes: 0, dislikes: 0},
+        {id: 2, text: "A jak często rolujesz?", likes: 0, dislikes: 0}
+      ],
+      likes: 0,
+      dislikes: 0
+    },
+    {
+      id: 4,
+      title: "❤️‍🔥 Cardio na świeżym powietrzu",
+      content: "Bieganie w parku może być świetną formą relaksu i spalania kalorii.",
+      author: "Kasia Runner",
+      date: "2025-06-04 06:45",
+      comments: [
+        {id: 1, text: "Zgadzam się, kocham biegać rano!", likes: 0, dislikes: 0},
+        {id: 2, text: "Jakie masz ulubione trasy?", likes: 0, dislikes: 0}
+      ],
+      likes: 0,
+      dislikes: 0
+    }
+  ];
+
+  const postsContainer = document.getElementById("posts-container");
+
+  function showToast(message) {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 4000);
+  }
+
+  // Wyświetl posty
+  function renderPosts() {
+    postsContainer.innerHTML = "";
+    examplePosts.forEach(post => {
+      const postElem = document.createElement("div");
+      postElem.className = "post";
+
+      postElem.innerHTML = `
+        <div class="post-header">
+          <h2 class="post-title">${post.title}</h2>
+          <div class="post-info">autor: ${post.author} | ${post.date}</div>
+        </div>
+        <div class="post-content">${post.content}</div>
+        <div class="post-actions">
+          <button class="like-post" data-id="${post.id}">👍 ${post.likes}</button>
+          <button class="dislike-post" data-id="${post.id}">👎 ${post.dislikes}</button>
+        </div>
+        <div class="comments" data-post-id="${post.id}">
+          ${post.comments.map(c => `
+            <div class="comment" data-comment-id="${c.id}">
+              <div class="comment-text">${c.text}</div>
+              <div>
+                <span class="comment-like" data-post-id="${post.id}" data-comment-id="${c.id}">👍 ${c.likes}</span>
+                <span class="comment-dislike" data-post-id="${post.id}" data-comment-id="${c.id}" style="color:#e74c3c; margin-left:8px;">👎 ${c.dislikes}</span>
+              </div>
+            </div>
+          `).join("")}
+          <form class="comment-form" data-post-id="${post.id}">
+            <textarea placeholder="Dodaj komentarz..." required></textarea>
+            <button type="submit">Dodaj</button>
+          </form>
+        </div>
+      `;
+
+      postsContainer.appendChild(postElem);
+    });
+  }
+
+  // Reakcje like/dislike posty i komentarze
+  postsContainer.addEventListener("click", e => {
+    if(e.target.matches(".like-post")) {
+      const id = parseInt(e.target.dataset.id);
+      const post = examplePosts.find(p => p.id === id);
+      if(post) {
+        post.likes++;
+        renderPosts();
+        showToast("👍 Polubiono post!");
+      }
+    }
+    else if(e.target.matches(".dislike-post")) {
+      const id = parseInt(e.target.dataset.id);
+      const post = examplePosts.find(p => p.id === id);
+      if(post) {
+        post.dislikes++;
+        renderPosts();
+        showToast("👎 Oceniono negatywnie.");
+      }
+    }
+    else if(e.target.matches(".comment-like")) {
+      const postId = parseInt(e.target.dataset.postId);
+      const commentId = parseInt(e.target.dataset.commentId);
+      const post = examplePosts.find(p => p.id === postId);
+      if(post) {
+        const comment = post.comments.find(c => c.id === commentId);
+        if(comment) {
+          comment.likes++;
+          renderPosts();
+          showToast("👍 Polubiono komentarz!");
+        }
+      }
+    }
+    else if(e.target.matches(".comment-dislike")) {
+      const postId = parseInt(e.target.dataset.postId);
+      const commentId = parseInt(e.target.dataset.commentId);
+      const post = examplePosts.find(p => p.id === postId);
+      if(post) {
+        const comment = post.comments.find(c => c.id === commentId);
+        if(comment) {
+          comment.dislikes++;
+          renderPosts();
+          showToast("👎 Oceniono komentarz negatywnie.");
+        }
+      }
+    }
+  });
+
+  // Dodawanie komentarza
+  postsContainer.addEventListener("submit", e => {
+    if(e.target.matches(".comment-form")) {
+      e.preventDefault();
+      const postId = parseInt(e.target.dataset.postId);
+      const post = examplePosts.find(p => p.id === postId);
+      if(post) {
+        const textarea = e.target.querySelector("textarea");
+        const newCommentText = textarea.value.trim();
+        if(newCommentText.length > 0) {
+          const newId = post.comments.length ? post.comments[post.comments.length -1].id + 1 : 1;
+          post.comments.push({id: newId, text: newCommentText, likes: 0, dislikes: 0});
+          renderPosts();
+          textarea.value = "";
+          showToast("💬 Komentarz dodany!");
+        }
+      }
+    }
+  });
+
+  // Asystent - rozwiniecie/składanie
+  const assistant = document.getElementById("assistant");
+  const assistantToggle = document.getElementById("assistant-toggle");
+  const assistantSend = document.getElementById("assistant-send");
+  const assistantInput = document.getElementById("assistant-input");
+  const assistantResponse = document.getElementById("assistant-response");
+
+  assistantToggle.addEventListener("click", e => {
+    e.stopPropagation();
+    if(assistant.classList.contains("expanded")) {
+      assistant.classList.remove("expanded");
+      assistantToggle.textContent = "+";
+    } else {
+      assistant.classList.add("expanded");
+      assistantToggle.textContent = "−";
+      assistantInput.focus();
+    }
+  });
+
+  assistant.addEventListener("click", () => {
+    if(!assistant.classList.contains("expanded")) {
+      assistant.classList.add("expanded");
+      assistantToggle.textContent = "−";
+      assistantInput.focus();
+    }
+  });
+
+  assistantSend.addEventListener("click", () => {
+    const question = assistantInput.value.trim();
+    if(question.length === 0) {
+      alert("Proszę wpisać pytanie lub problem.");
+      return;
+    }
+    assistantResponse.textContent = "Przetwarzam zapytanie...";
+    // Symulacja odpowiedzi eksperta po 1.5s
+    setTimeout(() => {
+      assistantResponse.textContent = "Ekspert mówi: Dzięki za pytanie! Sprawdź nasze FAQ i wróć, jeśli potrzebujesz więcej pomocy 😉";
+      assistantInput.value = "";
+    }, 1500);
+  });
+
+  // Inicjuj wyświetlanie postów
+  renderPosts();
+</script>
+
+</body>
+</html>

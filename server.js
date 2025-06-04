@@ -469,6 +469,10 @@ app.get('/licznik.html', (req, res) => {
     res.sendFile(path.join(__dirname, '/licznik.html'));
 });
 
+app.get('/blog.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '/blog.html'));
+});
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
