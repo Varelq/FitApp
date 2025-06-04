@@ -112,9 +112,10 @@
     <div class="change-form form-wrapper" id="passwordForm">
         <input type="password" id="currentPassword" placeholder="Aktualne hasło">
         <input type="password" id="newPassword" placeholder="Nowe hasło">
-        <button>Zapisz</button>
+        <button onclick="changePassword()">Zapisz</button>
     </div>
 
+    <!-- Rola -->
     <div class="profile-row">
         <div class="profile-label">Uprawnienia:</div>
         <div class="profile-value" id="role"></div>
@@ -131,23 +132,62 @@
         <button>Zapisz</button>
     </div>
 
-    <script>
-        function toggleForm(id) {
-            const forms = document.querySelectorAll('.change-form');
-            forms.forEach(form => {
-                if (form.id === id) {
-                    form.style.display = form.style.display === 'block' ? 'none' : 'block';
-                } else {
-                    form.style.display = 'none';
-                }
-            });
-        }
+    <!-- Wzrost -->
+    <div class="profile-row">
+        <div class="profile-label">Wzrost: (cm)</div>
+        <div class="profile-value" id="currentHeight"></div>
+        <button onclick="toggleForm('heightForm')">Zmień</button>
+    </div>
+    <div class="change-form form-wrapper" id="heightForm">
+        <input type="number" id="newHeight">
+        <button>Zapisz</button>
+    </div>
 
-        window.onload = () => {
-            forProfilePage();
-        };
-    </script>
-    <script src="/public/login_script.js"></script>
+    <!-- Waga -->
+    <div class="profile-row">
+        <div class="profile-label">Waga: (kg)</div>
+        <div class="profile-value" id="currentWeight"></div>
+        <button onclick="toggleForm('weightForm')">Zmień</button>
+    </div>
+    <div class="change-form form-wrapper" id="weightForm">
+        <input type="number" id="newWeight">
+        <button>Zapisz</button>
+    </div>
+
+    <!-- Płeć -->
+    <div class="profile-row">
+        <div class="profile-label">Płeć:</div>
+        <div class="profile-value" id="currentGender"></div>
+        <button onclick="toggleForm('genderForm')">Zmień</button>
+    </div>
+    <div class="change-form form-wrapper" id="genderForm">
+        <input type="text" id="newGender">
+        <button>Zapisz</button>
+    </div>
+
+    <!-- Poziom aktywności -->
+    <div class="profile-row">
+        <div class="profile-label">Poziom aktywności:</div>
+        <div class="profile-value" id="currentActivityLevel"></div>
+        <button onclick="toggleForm('activityLevelForm')">Zmień</button>
+    </div>
+    <div class="change-form form-wrapper" id="activityLevelForm">
+        <input type="text" id="newActivityLevel">
+        <button>Zapisz</button>
+    </div>
+
+    <!--Cel -->
+    <div class="profile-row">
+        <div class="profile-label">Cel:</div>
+        <div class="profile-value" id="currentGoal"></div>
+        <button onclick="toggleForm('goalForm')">Zmień</button>
+    </div>
+    <div class="change-form form-wrapper" id="goalForm">
+        <input type="text" id="newGoal">
+        <button>Zapisz</button>
+    </div>
+
+    <script src="/public/profile_script.js"></script>
 </body>
 
 </html>
