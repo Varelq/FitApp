@@ -5,7 +5,7 @@ const recipes = [
         author: "Anna Dietetyk",
         date: "2025-06-01",
         tags: ["kurczak", "sałatka", "lunch", "fit"],
-        img: "public/recipes/kurczak_awokado.jpg"
+        img: "public/kurczak_awokado.png"
     },
     {
         name: "Owsianka z owocami i orzechami",
@@ -13,7 +13,7 @@ const recipes = [
         author: "Marek Triceps",
         date: "2025-06-02",
         tags: ["owsianka", "śniadanie", "fit", "orzechy"],
-        img: "public/recipes/owsianka.jpg"
+        img: "public/owsianka.png"
     },
     {
         name: "Pieczony łosoś z warzywami",
@@ -21,7 +21,7 @@ const recipes = [
         author: "Kasia Runner",
         date: "2025-06-03",
         tags: ["łosoś", "obiad", "omega3", "fit"],
-        img: "public/recipes/losos.jpg"
+        img: "public/losos.png"
     },
     {
         name: "Omlet białkowy z warzywami",
@@ -29,7 +29,7 @@ const recipes = [
         author: "Janek Fizjo",
         date: "2025-06-04",
         tags: ["omlet", "kolacja", "białko", "warzywa"],
-        img: "public/recipes/omlet.jpg"
+        img: "public/omlet.png"
     }
 ];
 
@@ -61,7 +61,7 @@ function renderRecipes(filter = "") {
         `;
         recipeList.appendChild(card);
     });
-}
+} 
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchBox = document.getElementById('searchBox');
