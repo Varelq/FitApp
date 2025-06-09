@@ -473,6 +473,11 @@ app.get('/blog.html', (req, res) => {
     res.sendFile(path.join(__dirname, '/blog.html'));
 });
 
+app.get('/przepisy.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '/przepisy.html'));
+});
+
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

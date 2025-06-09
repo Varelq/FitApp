@@ -185,21 +185,7 @@
             `;
         }
 
-        function showRecipes() {
-            const main = document.querySelector('main');
-            main.innerHTML = `
-                <div class="box">
-                    <h2>Przepisy Fitness</h2>
-                    <ul>
-                        <li>Sałatka z kurczakiem i awokado</li>
-                        <li>Owsianka z owocami i orzechami</li>
-                        <li>Pieczony łosoś z warzywami</li>
-                        <li>Omlet białkowy z warzywami</li>
-                    </ul>
-                </div>
-            `;
-        }
-
+       
         // Powrót do menu głównego po kliknięciu w nagłówek
         function returnToMainMenu() {
             const main = document.querySelector('main');
@@ -254,10 +240,12 @@
         <img src="/public/logo.png" alt="Logo"> <!-- Dodano logo -->
     </header>
     <nav>
-        <a onclick="location.href='blog.html'">Blog</a>
-        <a href="licznik.html">Licznik BMR</a>
-        <a href="#" onclick="showRecipes()">Przepisy</a>
+    <a href="blog.html">Blog</a>
+    <a href="licznik.html">Licznik BMR</a>
+    <a href="przepisy.html">Przepisy</a>
     </nav>
+
+
     <main>
         <p>To jest główna strona. Kliknij zakładki, aby przejść do innych stron.</p>
     </main>
