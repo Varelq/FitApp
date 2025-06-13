@@ -126,37 +126,3 @@ async function InsertUserData() {
         alert("Błąd połączenia z serwerem");
     }
 }
-
-async function forMainPage() {
-    user = await loggedUser();
-    if (!user) return;
-
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) loginButton.innerHTML = `<button onclick="logout()">Wyloguj</button>`;
-
-    const profileButton = document.getElementById('profileButton');
-    if (profileButton) profileButton.style.display = 'inline-block';
-
-    if (user.role === 'admin') {
-        const adminButton = document.getElementById('adminButton');
-        if (adminButton) adminButton.style.display = 'inline-block';
-    }
-}
-
-// Sprawdza czy uzytkownik jest juz zalogowany
-async function loggedUser() {
-    const res = await fetch('/api/me', { credentials: 'include' });
-    if (!res.ok) return false;
-    const user = await res.json();
-    return user;
-}
-
-// Wylogowanie
-async function logout() {
-    await fetch('/api/logout', { method: 'POST' });
-    location.reload();
-}
-
-window.onload = () => {
-    forMainPage();
-};
