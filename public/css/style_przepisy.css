@@ -6,56 +6,11 @@ body {
     padding: 0;
     color: #212121;
 }
-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(90deg,#4caf50 0%,#388e3c 100%);
-    color: #fff;
-    padding: 24px 0 16px 0;
-    cursor: pointer;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(76,175,80,0.07);
-}
-header h1 {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin: 0 18px 0 0;
-    letter-spacing: 2px;
-}
-header h1 span {
-    color: #000;
-}
-header img {
-    width: 54px;
-    height: 54px;
-}
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    margin: 18px 0 0 0;
-}
-nav a {
-    text-decoration: none;
-    color: #fff;
-    background: #4caf50;
-    border-radius: 8px;
-    padding: 10px 26px;
-    font-weight: 600;
-    font-size: 1.1em;
-    border: 2px solid transparent;
-    transition: background 0.2s, color 0.2s, border 0.2s;
-}
-nav a.active, nav a:hover {
-    background: #fff;
-    color: #4caf50;
-    border: 2px solid #4caf50;
-}
+
 main {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 24px 12px 0 12px;
+    padding: 200px 12px 0 12px;
 }
 .recipes-hero {
     text-align: center;
@@ -162,6 +117,9 @@ footer {
 @media (max-width: 700px) {
     header h1 {
         font-size: 1.5em;
+    }
+    main {
+        padding-top: 30px;
     }
     .recipes-hero h2 {
         font-size: 1.2em;
