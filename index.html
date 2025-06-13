@@ -4,256 +4,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitapp</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-
-        header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #4CAF50;
-            color: #ffffff;
-            padding: 20px;
-            position: relative;
-            cursor: pointer;
-            /* Dodano kursor wskazujący */
-            transition: transform 0.3s ease;
-            /* Animacja powiększania */
-        }
-
-        header:hover {
-            transform: scale(1.05);
-            /* Powiększenie nagłówka */
-        }
-
-        header h1 {
-            font-size: 3em;
-            font-weight: bold;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-right: 20px;
-            /* Odstęp między logo a tekstem */
-        }
-
-        header h1 span {
-            color: #000000;
-            /* Czarny akcent */
-        }
-
-        header img {
-            width: 60px;
-            height: 60px;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(to right, #4CAF50, #ffffff, #000000);
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            /* Dostosowanie do mniejszych ekranów */
-        }
-
-        nav a {
-            display: inline-block;
-            margin: 10px;
-            padding: 15px 30px;
-            text-decoration: none;
-            color: #ffffff;
-            font-weight: bold;
-            font-size: 1.2em;
-            background-color: #4CAF50;
-            border: 2px solid #000000;
-            /* Zielono-czarna ramka */
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        nav a:hover {
-            background-color: #45a049;
-            color: #000000;
-            border-color: #4CAF50;
-        }
-
-        footer {
-            text-align: center;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .box {
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-            margin: 10px;
-            padding: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            /* Ukryte na początku */
-            animation: fade-in 0.5s ease forwards;
-            /* Animacja pojawiania się */
-        }
-
-        @keyframes fade-in {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-                /* Przesunięcie w dół */
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-                /* Powrót na miejsce */
-            }
-        }
-
-        .banner {
-            background-color: #2E7D32;
-            /* Ciemnozielony kolor */
-            color: #ffffff;
-            text-align: center;
-            padding: 20px 0;
-            font-size: 1.5em;
-            font-weight: bold;
-            transition: transform 0.3s ease;
-            /* Animacja powiększania */
-            cursor: pointer;
-        }
-
-        .banner:hover {
-            transform: scale(1.1);
-            /* Powiększenie napisu */
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        button:hover {
-            background-color: #14a450;
-        }
-
-        #loginButton {
-            display: inline-block;
-        }
-
-        #adminButton {
-            display: none;
-        }
-
-        #profileButton {
-            display: none;
-        }
-    </style>
-    <script>
-        // Funkcje do wyświetlania zawartości
-        function showBlogContent() {
-            const main = document.querySelector('main');
-            main.innerHTML = `
-                <div class="box">
-                    <h2>Dodaj wpis</h2>
-                    <p>Formularz do dodawania nowego wpisu.</p>
-                </div>
-                <div class="box">
-                    <h2>Dodaj komentarz</h2>
-                    <p>Formularz do dodawania komentarza.</p>
-                </div>
-            `;
-        }
-
-       
-        // Powrót do menu głównego po kliknięciu w nagłówek
-        function returnToMainMenu() {
-            const main = document.querySelector('main');
-            main.innerHTML = `
-                <p>To jest główna strona. Kliknij zakładki, aby przejść do innych stron.</p>
-            `;
-        }
-
-        async function forMainPage() {
-            user = await loggedUser();
-            if (!user) return;
-
-            const loginButton = document.getElementById('loginButton');
-            if (loginButton) loginButton.innerHTML = `<button onclick="logout()">Wyloguj</button>`;
-
-            const profileButton = document.getElementById('profileButton');
-            if (profileButton) profileButton.style.display = 'inline-block';
-
-            if (user.role === 'admin') {
-                const adminButton = document.getElementById('adminButton');
-                if (adminButton) adminButton.style.display = 'inline-block';
-            }
-        }
-
-        // Sprawdza czy uzytkownik jest juz zalogowany
-        async function loggedUser() {
-            const res = await fetch('/api/me', { credentials: 'include' });
-            if (!res.ok) return false;
-            const user = await res.json();
-            return user;
-        }
-
-        // Wylogowanie
-        async function logout() {
-            await fetch('/api/logout', { method: 'POST' });
-            location.reload();
-        }
-
-        window.onload = () => {
-            forMainPage();
-        };
-    </script>
+    <title>FitApp</title>
+    <link rel="stylesheet" href="/public/css/style_index.css">
+    <link rel="stylesheet" href="/public/css/style_header.css">
+    <script src="/public/header_sript.js"></script>
 </head>
 
 <body>
-    <div id="loginButton"><button onclick="location.href='login.html'">Logowanie</button></div>
-    <!-- logowanie/wylogowanie -->
-    <div id="adminButton"><button onclick="location.href='admin.html'">Administrowanie</button></div>
-    <div id="profileButton"><button onclick="location.href='profile.html'">Profil</button></div>
-    <header onclick="returnToMainMenu()">
-        <h1><span>Fit</span>App</h1>
-        <img src="/public/logo.png" alt="Logo"> <!-- Dodano logo -->
-    </header>
-    <nav>
-    <a href="blog.html">Blog</a>
-    <a href="licznik.html">Licznik BMR</a>
-    <a href="przepisy.html">Przepisy</a>
-    </nav>
 
+    <header>
+        <div class="user-dropdown">
+            <div class="hamburger" onclick="toggleDropdown()">
+              &#9776;
+            </div>
+            <div class="dropdown-menu" id="userDropdown">
+                <div class="dropdown-username" id="dropdownUsername">Witaj, Użytkowniku</div>
+                <div id="loginButton"><button onclick="location.href='login.html'"> <span class="icon">🔓</span> Logowanie</button></div>
+                <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span> Administrowanie</button></div>
+                <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span> Profil</button></div>
+            </div>
+          </div>
+        <div class="header-left" onclick="location.href='index.html'">
+            <div class="title-wrapper">
+                <div class="line"></div>
+                <div class="title-logo">
+                    <img src="/public/logo.png" alt="Logo">
+                    <h1><span>Fit</span>App</h1>
+                </div>
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="header-right">
+            <button onclick="location.href='blog.html'">Blog</button>
+            <button onclick="location.href='licznik.html'">Kalkulator BMR</button>
+            <button onclick="location.href='przepisy.html'">Przepisy</button>
+        </div>
+      </header>
 
     <main>
-        <p>To jest główna strona. Kliknij zakładki, aby przejść do innych stron.</p>
+        <div class="main-content">
+            <div class="left-column">
+                <section class="intro-section">
+                    <h2>Witaj w <span class="highlight">FitApp</span>!</h2>
+                <p>Twoja podróż ku zdrowiu, lepszej kondycji i dobremu samopoczuciu zaczyna się właśnie tutaj. 
+                    FitApp to kompleksowa platforma dla wszystkich, którzy 
+                    chcą zadbać o swoje ciało i styl życia — bez względu na to, czy dopiero 
+                    zaczynasz swoją przygodę z aktywnością fizyczną, czy jesteś doświadczonym pasjonatem fitnessu.Znajdziesz tutaj:</p>
+                <ul class="feature-list">
+                    <li><span class="emoji">📝</span><strong>Blog</strong> Przestrzeń pełna inspirujących artykułów, porad ekspertów, ciekawostek i aktualnych 
+                        trendów ze świata sportu, zdrowego odżywiania i psychologii motywacji. Dołącz do dyskusji, komentuj i dziel się swoimi doświadczeniami!</li>
+                    <li><span class="emoji">🔢</span><strong>Kalkulator BMR</strong> Intuicyjne narzędzie, które pomoże Ci w prosty sposób obliczyć swoje 
+                        podstawowe zapotrzebowanie kaloryczne. Dowiedz się, ile kalorii 
+                        naprawdę potrzebujesz — czy Twoim celem jest redukcja, masa czy utrzymanie wagi.</li>
+                    <li><span class="emoji">🥗</span><strong>Przepisy kulinarne</strong> Zdrowe, zbilansowane i smaczne propozycje 
+                        na śniadania, obiady i kolacje. Idealne dla osób aktywnych, 
+                        dbających o sylwetkę i zdrowie — bez wyrzeczeń, bez monotonii.</li>
+                </ul>
+                <p class="cta">Skorzystaj z menu powyżej, aby przejść do interesującej Cię sekcji i rozpocząć 
+                    swoją fit-przygodę razem z nami. Z FitApp masz dostęp do przydatnych narzędzi, wiedzy i społeczności, która wspiera Cię w osiąganiu celów.</p>
+                </section>
+
+                <section class="blog-preview">
+                    <h2>📰 Ostatnie artykuły</h2>
+                    <div class="articles">
+                      <article>
+                        <h3>Jak zacząć ćwiczyć bez stresu</h3>
+                        <p>Proste kroki dla początkujących, by wejść w świat fitnessu z pewnością siebie.</p>
+                        <button onclick="location.href='blog.html#post1'">Czytaj dalej</button>
+                      </article>
+                      <article>
+                        <h3>5 błędów w diecie – i jak ich unikać</h3>
+                        <p>Poznaj najczęstsze pułapki dietetyczne i sprawdź, jak je wyeliminować.</p>
+                        <button onclick="location.href='blog.html#post2'">Czytaj dalej</button>
+                      </article>
+                    </div>
+                  </section>
+            </div>
+
+            <section class="recipe-section">
+                <h2>Nowe przepisy</h2>
+                <div class="recipes-grid">
+                  <a class="recipe-card" href="przepisy.html">
+                    <img src="/public/kurczak_awokado.png" alt="Sałatka z kurczakiem i awokado">
+                    <div class="recipe-content">
+                      <h3>Sałatka z kurczakiem i awokado</h3>
+                      <p>Lekka, pożywna i idealna na lunch.</p>
+                      <button>Czytaj przepis</button>
+                    </div>
+                  </a>
+                  <a class="recipe-card" href="przepisy.html">
+                    <img src="/public/owsianka.png" alt="Owsianka z owocami i orzechami">
+                    <div class="recipe-content">
+                      <h3>Owsianka z owocami i orzechami</h3>
+                      <p>Bogate w białko – idealne śniadanie.</p>
+                      <button>Czytaj przepis</button>
+                    </div>
+                  </a>
+                  <a class="recipe-card" href="przepisy.html">
+                    <img src="/public/losos.png" alt="Pieczony łosoś z warzywami">
+                    <div class="recipe-content">
+                      <h3>Pieczony łosoś z warzywami</h3>
+                      <p>Pełny smaku, pożywny i zdrowy.</p>
+                      <button>Czytaj przepis</button>
+                    </div>
+                  </a>
+                </div>
+              </section>
+        </div>
     </main>
+
     <footer>
-        <p>&copy; FitApp ZOO.</p>
+        <p>&copy; 2025 FitApp ZOO. Wszystkie prawa zastrzeżone.</p>
     </footer>
-    <div class="banner" onclick="returnToMainMenu()">
-        FitApp
+
+    <div class="banner" onclick="location.href='index.html'">
+        FitApp – Twoja droga do zdrowego stylu życia
     </div>
 </body>
 

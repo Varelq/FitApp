@@ -5,18 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitApp Przepisy</title>
     <link rel="stylesheet" href="public/css/style_przepisy.css">
+    <link rel="stylesheet" href="public/css/style_header.css">
     <script src="public/przepisy.js" defer></script>
+    <script src="public/header_sript.js"></script>
 </head>
 <body>
-    <header onclick="location.href='index.html'">
-        <h1><span>Fit</span>App</h1>
-        <img src="/public/logo.png" alt="Logo">
-    </header>
-    <nav>
-        <a href="blog.html">Blog</a>
-        <a href="licznik.html">Licznik BMR</a>
-        <a href="przepisy.html" class="active">Przepisy</a>
-    </nav>
+
+    <header>
+        <div class="user-dropdown">
+            <div class="hamburger" onclick="toggleDropdown()">
+              &#9776;
+            </div>
+            <div class="dropdown-menu" id="userDropdown">
+                <div class="dropdown-username" id="dropdownUsername">Witaj, Użytkowniku</div>
+                <div id="loginButton"><button onclick="location.href='login.html'"> <span class="icon">🔓</span> Logowanie</button></div>
+                <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span> Administrowanie</button></div>
+                <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span> Profil</button></div>
+            </div>
+          </div>
+        <div class="header-left" onclick="location.href='index.html'">
+            <div class="title-wrapper">
+                <div class="line"></div>
+                <div class="title-logo">
+                    <img src="/public/logo.png" alt="Logo">
+                    <h1><span>Fit</span>App</h1>
+                </div>
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="header-right">
+            <button onclick="location.href='blog.html'">Blog</button>
+            <button onclick="location.href='licznik.html'">Kalkulator BMR</button>
+            <button onclick="location.href='przepisy.html'">Przepisy</button>
+        </div>
+      </header>
+
     <main>
         <section class="recipes-hero">
             <h2>Przepisy Fitness</h2>
@@ -27,8 +50,13 @@
             <!-- JS will render recipe cards here -->
         </section>
     </main>
+    
     <footer>
-        <p>&copy; FitApp ZOO.</p>
+        <p>&copy; 2025 FitApp ZOO. Wszystkie prawa zastrzeżone.</p>
     </footer>
+
+    <div class="banner" onclick="location.href='index.html'">
+        FitApp – Twoja droga do zdrowego stylu życia
+    </div>
 </body>
 </html>
