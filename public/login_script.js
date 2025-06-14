@@ -1,4 +1,23 @@
-let currentForm = 'login'; // Domyślny tryb to logowanie
+let currentForm = 'login';
+let messageTimer = null;
+
+document.getElementById("userForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (currentForm === 'login') {
+        Login();
+    } else if (currentForm === 'register') {
+        Register();
+    }
+    else if (currentForm === 'sendEmail') {
+        sendEmail();
+    }
+    else if (currentForm === 'verifyCode') {
+        verifyCode();
+    }
+    else if (currentForm === 'changePassword') {
+        changePassword();
+    }
+});
 
 function updateTitle(title) {
     document.getElementById("formTitle").innerText = title;
@@ -8,11 +27,15 @@ function renderLoginForm() {
     const form = document.getElementById("userForm");
     form.innerHTML = `
                 <input type="text" name="username" id="username" placeholder="Nazwa użytkownika" required /><br><br>
-                <input type="password" name="password" id="password" placeholder="Hasło" required /><br><br>
-                <button type="button" onclick="handleLoginClick()">Zaloguj się</button>
-                <button type="button" onclick="handleRegisterClick()">Zarejestruj się</button>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Hasło" required />
+                    <i class="fa-solid fa-eye" id="togglePassword" onclick="seePassword()"></i>
+                </div><br><br>
+                <button type="submit">Zaloguj się</button>
+                <button type="button" onclick="renderSendEmailForm()">Resetuj hasło</button>
+                <button type="button" onclick="renderRegisterForm()">Zarejestruj się</button>
             `;
-    updateTitle("Logowanie");
+    document.getElementById("formTitle").innerText = "Logowanie";
     currentForm = 'login';
 }
 
@@ -20,14 +43,19 @@ function renderRegisterForm() {
     const form = document.getElementById("userForm");
     form.innerHTML = `
                 <input type="text" name="username" id="username" placeholder="Nazwa użytkownika" required /><br><br>
-                <input type="password" name="password" id="password" placeholder="Hasło" required /><br><br>
+                <input type="email" name="email" id="email" placeholder="Adres e-mail" required /><br><br>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Hasło" required />
+                    <i class="fa-solid fa-eye" id="togglePassword" onclick="seePassword()"></i>
+                </div><br><br>
                 <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Powtórz hasło" required /><br><br>
-                <div class="optional-section">
 
+                <button type="button" id="toggleOptional">Pokaż dane opcjonalne</button><br><br>
+                <div class="optional-section" id="optionalSection" style="display: none;">
                     <h3>Dane opcjonalne</h3>
                     <input type="date" name="birthdate" id="birthdate" placeholder="Data urodzenia" /><br><br>
-                    <input type="number" name="height" id="height" placeholder="Wzrost (cm)" min="1" /><br><br>
-                    <input type="number" name="weight" id="weight" placeholder="Waga (kg)" min="1" /><br><br>
+                    <input type="number" name="height" id="height" placeholder="Wzrost (cm)" min="1" max="300" /><br><br>
+                    <input type="number" name="weight" id="weight" placeholder="Waga (kg)" min="1" max="600" /><br><br>
 
                     <select name="gender" id="gender">
                         <option value="">Płeć</option>
@@ -51,31 +79,79 @@ function renderRegisterForm() {
                         <option value="maintain">Utrzymać wagę</option>
                         <option value="gain">Przytyć</option>
                     </select><br><br>
-
                 </div><br>
 
-                <button type="button" onclick="handleLoginClick()">Zaloguj się</button>
-                <button type="button" onclick="handleRegisterClick()">Zarejestruj się</button>
+                <button type="button" onclick="renderLoginForm()">Zaloguj się</button>
+                <button type="submit">Zarejestruj się</button>
             `;
-    updateTitle("Rejestracja");
+    document.getElementById("formTitle").innerText = "Rejestracja";
     currentForm = 'register';
+
+    document.getElementById("toggleOptional").addEventListener("click", () => {
+        const section = document.getElementById("optionalSection");
+        const button = document.getElementById("toggleOptional");
+
+        if (section.style.display === "none") {
+            section.style.display = "block";
+            button.textContent = "Ukryj dane opcjonalne";
+        } else {
+            section.style.display = "none";
+            button.textContent = "Pokaż dane opcjonalne";
+        }
+    });
 }
 
-function handleLoginClick() {
-    if (currentForm === 'login') {
-        Login();
-    } else {
-        renderLoginForm();
-    }
+function renderSendEmailForm() {
+    const form = document.getElementById("userForm");
+    form.innerHTML = `
+        <input type="email" id="resetEmail" placeholder="Podaj adres e-mail konta" required /><br><br>
+        <button type="submit">Wyślij kod</button>
+        <button type="button" onclick="renderLoginForm()">Wróć</button>
+    `;
+    document.getElementById("formTitle").innerText = "Reset hasła";
+    currentForm = 'sendEmail';
 }
 
-function handleRegisterClick() {
-    if (currentForm === 'register') {
-        Register();
-    } else {
-        renderRegisterForm();
-    }
+function renderVerifyCodeForm(email) {
+    const form = document.getElementById("userForm");
+    form.innerHTML = `
+        <p>Wysłano kod na: <b>${email}</b></p>
+        <input type="text" id="resetCode" placeholder="Wpisz 6-cyfrowy kod" maxlength="6" required /><br><br>
+        <button type="submit">Zweryfikuj kod</button>
+        <button type="button" onclick="renderLoginForm()">Anuluj</button>
+    `;
+    document.getElementById("formTitle").innerText = "Weryfikacja kodu";
+    currentForm = 'verifyCode';
 }
+
+function renderChangePasswordForm() {
+    const form = document.getElementById("userForm");
+    form.innerHTML = `
+        <p>Ustaw nowe hasło</p>
+        <div class="password-wrapper">
+            <input type="password" name="password" id="password" placeholder="Hasło" required />
+            <i class="fa-solid fa-eye" id="togglePassword" onclick="seePassword()"></i>
+        </div><br><br>
+        <input type="password" id="confirmPassword" placeholder="Powtórz nowe hasło" required /><br><br>
+        <button type="submit">Zmień hasło</button>
+        <button type="button" onclick="renderLoginForm()">Anuluj</button>
+    `;
+    document.getElementById("formTitle").innerText = "Ustaw nowe hasło";
+    currentForm = 'changePassword';
+}
+
+function seePassword() {
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    if (confirmPassword) {
+        confirmPassword.setAttribute('type', type);
+    }
+    togglePassword.classList.toggle('fa-eye');
+    togglePassword.classList.toggle('fa-eye-slash');
+};
 
 async function forLoginPage() {
     user = await loggedUser();
@@ -83,21 +159,28 @@ async function forLoginPage() {
 
     const formContainer = document.getElementById('formContainer');
     if (formContainer) formContainer.style.display = 'none';
+
+    const message = document.getElementById('message');
+    if (message) message.innerHTML = "Zalogowano";
 }
 
 // Logowanie
 async function Login() {
     const form = document.getElementById('userForm');
     const message = document.getElementById('message');
-    const formData = new FormData(form);
 
+    message.style.display = "block";
+    if (messageTimer) clearTimeout(messageTimer);
+    messageTimer = setTimeout(() => {
+        message.style.display = "none";
+        message.innerHTML = "";
+        messageTimer = null;
+    }, 4000);
+
+    const formData = new FormData(form);
+    // Usuwanie niepotrzebnych spacji, tabulatorow itd.
     const username = (formData.get('username') || '').trim();
     const password = (formData.get('password') || '').trim();
-
-    if (username === '' || password === '') {
-        message.innerHTML = "Brakujące dane";
-        return;
-    }
 
     const data = {
         username: username,
@@ -109,18 +192,16 @@ async function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
+    info = await res.json();
 
     if (res.ok) {
-        message.innerHTML = "Zalogowano";
         forLoginPage();
         form.reset();
+        location.href = 'index.html';
     }
-    if (res.status === 401) {
-        message.innerHTML = "Niepoprawne haslo lub nazwa uzytkownika";
+    else {
+        message.innerHTML = (info.message || "Wystąpił błąd");
         form.reset();
-    }
-    if (res.status === 400) {
-        message.innerHTML = "Niepoprawne dane";
     }
 }
 
@@ -128,10 +209,19 @@ async function Login() {
 async function Register() {
     const form = document.getElementById('userForm');
     const message = document.getElementById('message');
-    const formData = new FormData(form);
 
+    message.style.display = "block";
+    if (messageTimer) clearTimeout(messageTimer);
+    messageTimer = setTimeout(() => {
+        message.style.display = "none";
+        message.innerHTML = "";
+        messageTimer = null;
+    }, 4000);
+
+    const formData = new FormData(form);
     // Usuwanie niepotrzebnych spacji, tabulatorow itd.
     const username = (formData.get('username') || '').trim();
+    const email = (formData.get('email') || '').trim();
     const password = (formData.get('password') || '').trim();
     const confirmPassword = (formData.get('confirmPassword') || '').trim();
     const birthdate = (formData.get('birthdate') || '').trim();
@@ -141,9 +231,10 @@ async function Register() {
     const activityLevel = (formData.get('activityLevel') || '').trim();
     const goal = (formData.get('goal') || '').trim();
 
-    // Sprawdzenie czy dane nie sa puste
-    if (username === '' || password === '' || confirmPassword === '') {
-        message.innerHTML = "Brakujące dane";
+    // Sprawdzanie emaila
+    const x = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!x.test(String(email).toLowerCase())) {
+        message.innerHTML = "Niepoprawny adres e-mail";
         return;
     }
 
@@ -153,63 +244,18 @@ async function Register() {
         return;
     }
 
-    // Walidacja długości hasła
-    if (password.length < 8) {
-        message.innerHTML = "Hasło musi mieć co najmniej 8 znaków";
+    // Walidacja hasła
+    if (password.length < 8 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/\d/.test(password)) {
+        message.innerHTML = "Hasło musi zawierać 8 znaków w tym: cyfrę oraz dużą i małą literę";
         return;
     }
-
-    // Walidacja dużej litery
-    if (!/[A-Z]/.test(password)) {
-        message.innerHTML = "Hasło musi zawierać co najmniej jedną dużą literę";
-        return;
-    }
-
-    // Walidacja cyfry
-    if (!/\d/.test(password)) {
-        message.innerHTML = "Hasło musi zawierać co najmniej jedną cyfrę";
-        return;
-    }
-
-    // Walidacja daty urodzenia
-    if (birthdate !== '') {
-        const today = new Date().toISOString().split('T')[0]; // dzisiejsza data w formacie YYYY-MM-DD
-        if (birthdate > today) {
-            message.innerHTML = "Data urodzenia nie może być z przyszłości";
-            return;
-        }
-    }
-
-    if (height && (isNaN(height) || height <= 0)) {
-        message.innerHTML = "Wzrost musi być dodatnią liczbą";
-        return;
-    }
-
-    if (weight && (isNaN(weight) || weight <= 0)) {
-        message.innerHTML = "Waga musi być dodatnią liczbą";
-        return;
-    }
-
-    if (gender !== '')
-        if (!["female", "male", "nonbinary"].includes(gender)) {
-            message.innerHTML = "Nieprawidłowa wartość pola płeć";
-            return;
-        }
-
-    if (activityLevel !== '')
-        if (!["sedentary", "light", "moderate", "active", "very_active"].includes(activityLevel)) {
-            message.innerHTML = "Nieprawidłowa wartość pola poziom aktywności";
-            return;
-        }
-
-    if (goal !== '')
-        if (!["lose", "maintain", "gain"].includes(goal)) {
-            message.innerHTML = "Nieprawidłowa wartość pola cel";
-            return;
-        }
 
     const data = {
         username: username,
+        email: email,
         password: password,
         confirmPassword: confirmPassword,
         birthdate: birthdate,
@@ -225,17 +271,98 @@ async function Register() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
+    info = await res.json();
 
     if (res.ok) {
-        message.innerHTML = "Zarejestrowano";
+        message.innerHTML = (info.message || "Wystąpił błąd");
         form.reset();
+        renderLoginForm();
     }
-    if (res.status === 409) {
-        message.innerHTML = "Nazwa użytkownika jest zajęta";
-        form.reset();
+    else {
+        message.innerHTML = (info.message || "Wystąpił błąd");
     }
-    if (res.status === 400) {
-        message.innerHTML = "Niepoprawne dane";
+}
+
+// Reset hasla
+async function sendEmail() {
+    const email = document.getElementById("resetEmail").value.trim();
+    const message = document.getElementById("message");
+    message.style.display = "block";
+
+    const x = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!x.test(String(email).toLowerCase())) {
+        message.innerHTML = "Niepoprawny adres e-mail";
+        return;
+    }
+
+    const res = await fetch('/api/sendEmail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    info = await res.json();
+
+    if (res.ok) {
+        message.innerHTML = (info.message || "Udało się");
+        renderVerifyCodeForm(email);
+    } else {
+        message.innerHTML = (info.message || "Wystąpił błąd");
+    }
+}
+
+async function verifyCode() {
+    const code = document.getElementById("resetCode").value.trim();
+    const message = document.getElementById("message");
+
+    if (!/^\d{6}$/.test(code)) {
+        message.innerHTML = "Kod musi miec 6 cyfr";
+        return;
+    }
+
+    const res = await fetch('/api/verifyCode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+    });
+    info = await res.json();
+
+    if (res.ok) {
+        message.innerHTML = (info.message || "Udało się");
+        renderChangePasswordForm();
+    } else {
+        message.innerHTML = (info.message || "Wystąpił błąd");
+    }
+}
+
+async function changePassword() {
+    const password = (document.getElementById('password').value || '').trim();
+    const confirmPassword = (document.getElementById('confirmPassword').value || '').trim();
+
+    if (password !== confirmPassword) {
+        message.innerHTML = "Hasła nie są takie same";
+        return;
+    }
+
+    if (password.length < 8 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/\d/.test(password)) {
+        message.innerHTML = "Hasło musi zawierać 8 znaków w tym: cyfrę oraz dużą i małą literę";
+        return;
+    }
+
+    const res = await fetch(`/api/user/password/reset`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password, confirmPassword: confirmPassword })
+    });
+    info = await res.json();
+
+    if (res.ok) {
+        message.innerHTML = (info.message || "Udało się");
+        renderLoginForm();
+    } else {
+        message.innerHTML = (info.message || "Wystąpił błąd");
     }
 }
 

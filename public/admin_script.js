@@ -13,7 +13,7 @@ async function loadUsers() {
         const users = await res.json();
         userList.innerHTML = users.map(u => `
                 <p>
-                    User #${u.id}: ${u.username} ${u.birthdate} ${u.gender} ${u.role}
+                    User #${u.id}: ${u.username} ${u.email} ${u.birthdate} ${u.gender} ${u.role}
                     <button onclick="deleteUser(${u.id})">Usuń</button>
                     <button onclick="toggleRole(${u.id})">Zmień rolę</button>
                 </p>
