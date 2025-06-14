@@ -5,186 +5,284 @@
     <meta charset="UTF-8">
     <title>Profil</title>
     <style>
+        :root {
+            --primary-green: #2ecc71;
+            --primary-dark: #27ae60;
+            --text-dark: #1e8449;
+            --background-light: #e8f5e9;
+            --section-bg: #f0fff5;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            background: #e8f5e9;
-            padding: 30px;
-            border-radius: 14px;
-            color: #2e7d32;
+            font-family: sans-serif;
+            background-color: var(--background-light);
+            margin: 0;
+            padding: 30px 15px;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 40px;
-            font-size: 28px;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+            border: 2px solid var(--primary-green);
         }
 
         .profile-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-            font-size: 18px;
+            margin-bottom: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
         }
 
         .profile-label {
             font-weight: bold;
-            width: 180px;
+            color: var(--text-dark);
+            flex: 1;
         }
 
         .profile-value {
-            flex: 1;
+            flex: 2;
+            color: #333;
+            padding: 0 10px;
+        }
+
+        .profile-row button {
+            background-color: var(--primary-green);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .profile-row button:hover {
+            background-color: var(--primary-dark);
         }
 
         .change-form {
             display: none;
             margin-top: 10px;
+            padding: 15px;
+            background-color: var(--section-bg);
+            border-left: 4px solid var(--primary-green);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(39, 174, 96, 0.1);
         }
 
-        input[type="text"],
-        input[type="password"],
-        input[type="date"] {
-            padding: 10px;
+        .change-form input,
+        .change-form select {
             width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
             font-size: 16px;
-            margin-top: 10px;
-            border-radius: 6px;
-            border: 1px solid #a5d6a7;
-            background-color: #f1f8e9;
         }
 
-        button {
-            padding: 10px 20px;
-            margin-top: 15px;
-            font-size: 16px;
-            cursor: pointer;
+        .change-form button {
+            background-color: var(--primary-green);
             border: none;
-            border-radius: 6px;
-            background-color: #66bb6a;
             color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
             transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: #388e3c;
+        .change-form button:hover {
+            background-color: var(--primary-dark);
         }
 
-        .form-wrapper {
-            padding-left: 190px;
-            margin-bottom: 30px;
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .profile-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .profile-value {
+                padding: 5px 0;
+            }
+
+            .profile-row button {
+                width: 100%;
+                margin-top: 8px;
+            }
         }
 
-        .form-wrapper label {
-            font-size: 14px;
-            margin-top: 10px;
-            display: block;
+        .top-button {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .top-button button {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .top-button button:hover {
+            background-color: var(--primary-dark);
         }
     </style>
 </head>
 
 <body>
-    <button onclick="location.href='index.html'">Strona Główna</button>
-    <h1>Profil użytkownika</h1>
-
-    <!-- Nazwa użytkownika -->
-    <div class="profile-row">
-        <div class="profile-label">Nazwa Użytkownika:</div>
-        <div class="profile-value" id="currentUsername"></div>
-        <button onclick="toggleForm('usernameForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="usernameForm">
-        <input type="text" id="newUsername" placeholder="Nowa nazwa">
-        <button onclick="changeUsername()">Zapisz</button>
+    <div class="top-button">
+        <button onclick="location.href='index.html'">Strona Główna</button>
     </div>
 
-    <!-- Hasło -->
-    <div class="profile-row">
-        <div class="profile-label">Hasło:</div>
-        <div class="profile-value">********</div>
-        <button onclick="toggleForm('passwordForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="passwordForm">
-        <input type="password" id="currentPassword" placeholder="Aktualne hasło">
-        <input type="password" id="newPassword" placeholder="Nowe hasło">
-        <button onclick="changePassword()">Zapisz</button>
-    </div>
+    <div class="container">
+        <h1>Profil użytkownika</h1>
+        <!-- Nazwa użytkownika -->
+        <div class="profile-row">
+            <div class="profile-label">Nazwa Użytkownika:</div>
+            <div class="profile-value" id="currentUsername"></div>
+            <button onclick="toggleForm('usernameForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="usernameForm">
+            <input type="text" id="newUsername" placeholder="Nowa nazwa" required>
+            <button type="submit">Zapisz</button>
+        </form>
 
-    <!-- Rola -->
-    <div class="profile-row">
-        <div class="profile-label">Uprawnienia:</div>
-        <div class="profile-value" id="role"></div>
-    </div>
+        <!-- E-mail -->
+        <div class="profile-row">
+            <div class="profile-label">Adres e-mail:</div>
+            <div class="profile-value" id="currentEmail"></div>
+            <button onclick="toggleForm('emailForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="emailForm">
+            <input type="email" id="newEmail" placeholder="Nowy adres e-mail" required>
+            <button type="submit">Zapisz</button>
+        </form>
 
-    <!-- Data urodzenia -->
-    <div class="profile-row">
-        <div class="profile-label">Data urodzenia:</div>
-        <div class="profile-value" id="currentBirthdate"></div>
-        <button onclick="toggleForm('birthdateForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="birthdateForm">
-        <input type="date" id="newBirthdate">
-        <button>Zapisz</button>
-    </div>
+        <!-- Hasło -->
+        <div class="profile-row">
+            <div class="profile-label">Hasło:</div>
+            <div class="profile-value">********</div>
+            <button onclick="toggleForm('passwordForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="passwordForm">
+            <input type="password" id="currentPassword" placeholder="Aktualne hasło" required>
+            <input type="password" id="newPassword" placeholder="Nowe hasło" required>
+            <button type="submit">Zapisz</button>
+        </form>
 
-    <!-- Wzrost -->
-    <div class="profile-row">
-        <div class="profile-label">Wzrost: (cm)</div>
-        <div class="profile-value" id="currentHeight"></div>
-        <button onclick="toggleForm('heightForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="heightForm">
-        <input type="number" id="newHeight">
-        <button>Zapisz</button>
-    </div>
+        <!-- Rola -->
+        <div class="profile-row">
+            <div class="profile-label">Uprawnienia:</div>
+            <div class="profile-value" id="role"></div>
+        </div>
 
-    <!-- Waga -->
-    <div class="profile-row">
-        <div class="profile-label">Waga: (kg)</div>
-        <div class="profile-value" id="currentWeight"></div>
-        <button onclick="toggleForm('weightForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="weightForm">
-        <input type="number" id="newWeight">
-        <button>Zapisz</button>
-    </div>
+        <!-- Data urodzenia -->
+        <div class="profile-row">
+            <div class="profile-label">Data urodzenia:</div>
+            <div class="profile-value" id="currentBirthdate"></div>
+            <button onclick="toggleForm('birthdateForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="birthdateForm">
+            <input type="date" id="newBirthdate">
+            <button type="submit">Zapisz</button>
+        </form>
 
-    <!-- Płeć -->
-    <div class="profile-row">
-        <div class="profile-label">Płeć:</div>
-        <div class="profile-value" id="currentGender"></div>
-        <button onclick="toggleForm('genderForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="genderForm">
-        <input type="text" id="newGender">
-        <button>Zapisz</button>
-    </div>
+        <!-- Wzrost -->
+        <div class="profile-row">
+            <div class="profile-label">Wzrost: (cm)</div>
+            <div class="profile-value" id="currentHeight"></div>
+            <button onclick="toggleForm('heightForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="heightForm">
+            <input type="number" id="newHeight" min="1" max="300">
+            <button type="submit">Zapisz</button>
+        </form>
 
-    <!-- Poziom aktywności -->
-    <div class="profile-row">
-        <div class="profile-label">Poziom aktywności:</div>
-        <div class="profile-value" id="currentActivityLevel"></div>
-        <button onclick="toggleForm('activityLevelForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="activityLevelForm">
-        <input type="text" id="newActivityLevel">
-        <button>Zapisz</button>
-    </div>
+        <!-- Waga -->
+        <div class="profile-row">
+            <div class="profile-label">Waga: (kg)</div>
+            <div class="profile-value" id="currentWeight"></div>
+            <button onclick="toggleForm('weightForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="weightForm">
+            <input type="number" id="newWeight" min="1" max="600">
+            <button type="submit">Zapisz</button>
+        </form>
 
-    <!--Cel -->
-    <div class="profile-row">
-        <div class="profile-label">Cel:</div>
-        <div class="profile-value" id="currentGoal"></div>
-        <button onclick="toggleForm('goalForm')">Zmień</button>
-    </div>
-    <div class="change-form form-wrapper" id="goalForm">
-        <input type="text" id="newGoal">
-        <button>Zapisz</button>
+        <!-- Płeć -->
+        <div class="profile-row">
+            <div class="profile-label">Płeć:</div>
+            <div class="profile-value" id="currentGender"></div>
+            <button onclick="toggleForm('genderForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="genderForm">
+            <select id="newGender">
+                <option value="">Usuń dane</option>
+                <option value="female">Kobieta</option>
+                <option value="male">Mężczyzna</option>
+                <option value="nonbinary">Niebinarna</option>
+            </select>
+            <button type="submit">Zapisz</button>
+        </form>
+
+        <!-- Poziom aktywności -->
+        <div class="profile-row">
+            <div class="profile-label">Poziom aktywności:</div>
+            <div class="profile-value" id="currentActivityLevel"></div>
+            <button onclick="toggleForm('activityLevelForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="activityLevelForm">
+            <select id="newActivityLevel">
+                <option value="">Usuń dane</option>
+                <option value="sedentary">Siedzący tryb życia</option>
+                <option value="light">Lekka aktywność</option>
+                <option value="moderate">Umiarkowana aktywność</option>
+                <option value="active">Duża aktywność</option>
+                <option value="very_active">Bardzo duża aktywność</option>
+            </select>
+            <button type="submit">Zapisz</button>
+        </form>
+
+        <!--Cel -->
+        <div class="profile-row">
+            <div class="profile-label">Cel:</div>
+            <div class="profile-value" id="currentGoal"></div>
+            <button onclick="toggleForm('goalForm')">Zmień</button>
+        </div>
+        <form class="change-form form-wrapper" id="goalForm">
+            <select id="newGoal">
+                <option value="">Usuń dane</option>
+                <option value="lose">Schudnąć</option>
+                <option value="maintain">Utrzymać wagę</option>
+                <option value="gain">Przytyć</option>
+            </select>
+            <button type="submit">Zapisz</button>
+        </form>
     </div>
 
     <script src="/public/profile_script.js"></script>
