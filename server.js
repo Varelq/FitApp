@@ -14,10 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,  // powinno być długie i ukryte w .env
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // ustaw na true tylko przy HTTPS
+    cookie: { secure: false }
 }));
 
 // Serve static files from the current directory
@@ -260,7 +260,7 @@ app.post('/api/sendEmail', (req, res) => {
                 transporter.sendMail({
                     from: `"Reset Hasła" <process.env.EMAIL_ADDRESS>`,
                     to: email,
-                    subject: 'Twój kod resetowania hasła',
+                    subject: `Twój kod resetowania hasła dla użytkownika: ${row.username}`,
                     text: `Twój kod resetujący to: ${code}\nWażny przez 10 minut.`
                 }, (err) => {
                     if (err) return res.status(500).send(err.message);
@@ -328,11 +328,15 @@ app.put('/api/user/birthdate', (req, res) => {
 
     const newBirthdate = typeof rawNewBirthdate === 'string' ? rawNewBirthdate.trim() : '';
 
-    if (newBirthdate !== '') {
-        const today = new Date().toISOString().split('T')[0];
-        if (newBirthdate > today) return res.status(400).json({ message: 'Niepoprawne dane' });
+    const bx = /^\d{4}-\d{2}-\d{2}$/;
+    const date = new Date(newBirthdate);
+    const today = new Date();
+    date.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    if (newBirthdate !== '')
+        if (!bx.test(newBirthdate)) return res.status(400).json({ message: 'Niepoprawne dane' });
+        else if (isNaN(date.getTime()) || date > today) return res.status(400).json({ message: 'Niepoprawne dane' });
         else birthdateToSave = newBirthdate;
-    }
     else birthdateToSave = null;
 
     if (!req.session.user) return res.status(401).json({ message: 'Musisz się zalogować' });
@@ -684,9 +688,13 @@ app.listen(port, '0.0.0.0', () => {
 function verifyUsername(rawUsername) {
     // Usuwanie niepotrzebnych spacji, tabulatorów itd.
     const username = typeof rawUsername === 'string' ? rawUsername.trim() : '';
+    const ux = /^[a-zA-Z0-9._]+$/;
 
     // Walidacja
-    if (username === '') {
+    if (username === '' ||
+        username.length < 3 ||
+        username.length > 20 ||
+        !ux.test(username)) {
         return null;
     }
     return username;
@@ -695,11 +703,11 @@ function verifyUsername(rawUsername) {
 function verifyEmail(rawEmail) {
     // Usuwanie niepotrzebnych spacji, tabulatorów itd.
     const email = typeof rawEmail === 'string' ? rawEmail.trim() : '';
-    const x = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const ex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     // Walidacja
     if (email === '' ||
-        !x.test(String(email).toLowerCase())) {
+        !ex.test(String(email).toLowerCase())) {
         return null;
     }
     return email;
@@ -729,38 +737,42 @@ function verifyOptional(rawBirthdate, height, weight, rawGender, rawActivityLeve
     const gender = typeof rawGender === 'string' ? rawGender.trim() : '';
     const activityLevel = typeof rawActivityLevel === 'string' ? rawActivityLevel.trim() : '';
     const goal = typeof rawGoal === 'string' ? rawGoal.trim() : '';
+    let birthdateToSave = null;
+    let genderToSave = null;
+    let heightToSave = null;
+    let weightToSave = null;
+    let activityLevelToSave = null;
+    let goalToSave = null;
 
-    if (birthdate !== '') {
-        const today = new Date().toISOString().split('T')[0];
-        if (birthdate > today) birthdateToSave = null;
+    const bx = /^\d{4}-\d{2}-\d{2}$/;
+    const date = new Date(birthdate);
+    const today = new Date();
+    date.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    if (birthdate !== '')
+        if (!bx.test(birthdate)) birthdateToSave = null;
+        else if (isNaN(date.getTime()) || date > today) birthdateToSave = null;
         else birthdateToSave = birthdate;
-    }
-    else birthdateToSave = null;
 
     if (height)
         if (isNaN(height) || height <= 0 || height > 300) heightToSave = null;
         else heightToSave = height;
-    else heightToSave = null;
 
     if (weight)
         if (isNaN(weight) || weight <= 0 || weight > 600) weightToSave = null;
         else weightToSave = weight;
-    else weightToSave = null;
 
     if (gender !== '')
         if (!["female", "male", "nonbinary"].includes(gender)) genderToSave = null;
         else genderToSave = gender;
-    else genderToSave = null;
 
     if (activityLevel !== '')
         if (!["sedentary", "light", "moderate", "active", "very_active"].includes(activityLevel)) activityLevelToSave = null;
         else activityLevelToSave = activityLevel;
-    else activityLevelToSave = null;
 
     if (goal !== '')
         if (!["lose", "maintain", "gain"].includes(goal)) goalToSave = null;
         else goalToSave = goal;
-    else goalToSave = null;
 
     return { birthdateToSave, heightToSave, weightToSave, genderToSave, activityLevelToSave, goalToSave };
 };
