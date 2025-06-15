@@ -110,12 +110,16 @@
         <input type="hidden" id="goal" required/>
 
         <button class="default-button" onclick="InsertUserData()">Wstaw wartości z danych profilu</button>
+        <div class="result-log-box" id="error-container" style="display: none;">
+            <p id="error-text"></p>
+            <a href='login.html'>Kliknij aby się zalogować</a>
+        </div>
         <button class="result-button" onclick="submitForm()">Oblicz</button>
 
         </div>
 
         <div class="result-box" id="resultbmr" style="display: none;">
-            <h3>Twoje dzienne zapotrzebowanie kaloryczne</h3>
+            <h3 id="resulth3">Twoje dzienne zapotrzebowanie kaloryczne</h3>
             <p id="resultbmrtext">Wynik pojawi się tutaj...</p>
         </div>
 

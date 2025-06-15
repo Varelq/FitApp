@@ -616,23 +616,28 @@ app.get('/api/userdata', (req, res) => {
             return res.status(404).json({ error: 'Użytkownik nie znaleziony' });
         }
 
-        // Oblicz wiek z daty urodzenia
-        const today = new Date();
-        const birthDate = new Date(row.birthdate);
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
+        // Oblicza wiek jak podano birthdate i jest poprawny
+        let age = null;
+        if (row.birthdate) {
+            const birthDate = new Date(row.birthdate);
+            if (!isNaN(birthDate.getTime())) {
+                const today = new Date();
+                age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+            }
         }
 
         // Zwróć dane z wiekiem zamiast daty urodzenia
         res.json({
-            weight: row.weight,
-            height: row.height,
-            age: age,
-            gender: row.gender,
-            activityLevel: row.activityLevel,
-            goal: row.goal
+            weight: row.weight || null,
+            height: row.height || null,
+            age: age, 
+            gender: row.gender || null,
+            activityLevel: row.activityLevel || null,
+            goal: row.goal || null
         });
     });
 });
