@@ -44,7 +44,7 @@ window.onload = () => {
 
 function toggleDropdown() {
     const dropdown = document.getElementById("userDropdown");
-    dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+    dropdown.style.display = (dropdown.style.display === "flex") ? "none" : "flex";
 }
 
 //kliknięcie poza menu je zamyka

@@ -16,11 +16,29 @@ function selectGoal(button) {
     document.getElementById('goal').value = button.getAttribute('data-goal');
 }
 
+function showError(message) {
+    const container = document.getElementById('error-container');
+    const containertext = document.getElementById('error-text');
+    containertext.innerText = message;
+    containertext.style.color = 'red';
+    container.style.display = 'block';
+}
+
+function clearError() {
+    const container = document.getElementById('error-container');
+    const containertext = document.getElementById('error-text');
+    containertext.innerText = '';
+    container.style.display = 'none';
+}
+
 async function submitForm() {
+    clearError();
+    
     const resultBoxBMR = document.getElementById("resultbmr");
     const resultTextBMR = document.getElementById("resultbmrtext");
     const resultBoxBMI = document.getElementById("resultbmi");
     const resultTextBMI = document.getElementById("resultbmitext");
+    const resulth3 = document.getElementById("resulth3");
 
     const weight = parseFloat(document.getElementById('weight').value);
     const height = parseFloat(document.getElementById('height').value);
@@ -30,8 +48,11 @@ async function submitForm() {
     const goal = document.getElementById('goal').value;
 
     if (!weight || !height || !age || !gender || !activityLevel || !goal) {
+        resulth3.style.display = "none";
+
         resultTextBMR.innerText = "Nie podałeś wszystkich wartości";
         resultBoxBMR.style.display = "block";
+        resultBoxBMR.style.color = "red";
         resultBoxBMR.style.opacity = "1";
 
         resultTextBMI.innerText = "";
@@ -74,16 +95,20 @@ async function submitForm() {
         resultBoxBMI.style.display = "block";
         resultBoxBMI.style.opacity = "1";
     }
+    resulth3.style.display = "block";
+    resultBoxBMR.style.color = "";
 }
 
 
 async function InsertUserData() {
     try {
+        clearError();
+
         const response = await fetch(`/api/userdata`);
         const data = await response.json();
 
         if (!response.ok) {
-            alert(data.error || 'Błąd pobierania danych');
+            showError(data.error || 'Błąd pobierania danych');
             return;
         }
 
@@ -123,6 +148,6 @@ async function InsertUserData() {
 
     } catch (err) {
         console.error(err);
-        alert("Błąd połączenia z serwerem");
+        showError('Błąd połączenia z serwerem.');
     }
 }
