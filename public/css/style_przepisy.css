@@ -114,12 +114,13 @@ footer {
     margin-top: 38px;
     border-top: 1px solid #e0e0e0;
 }
+
 @media (max-width: 700px) {
     header h1 {
         font-size: 1.5em;
     }
     main {
-        padding-top: 30px;
+        padding-top: 150px;
     }
     .recipes-hero h2 {
         font-size: 1.2em;
