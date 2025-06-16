@@ -1,24 +1,36 @@
-async function forAdminPage() {
-    user = await loggedUser();
-    if (!user) return;
+let users = [];
 
-    loadUsers();
+async function loadUsers() {
+    const res = await fetch('/api/users');
+    users = await res.json();
+    renderTable(users);
 }
 
-// Zwraca liste zarejestrowanych uzytkownikow
-async function loadUsers() {
-    const userList = document.getElementById('userList');
-    if (userList) {
-        const res = await fetch('/api/users');
-        const users = await res.json();
-        userList.innerHTML = users.map(u => `
-                <p>
-                    User #${u.id}: ${u.username} ${u.email} ${u.birthdate} ${u.gender} ${u.role}
-                    <button onclick="deleteUser(${u.id})">Usuń</button>
-                    <button onclick="toggleRole(${u.id})">Zmień rolę</button>
-                </p>
-                `).join('');
-    }
+function renderTable(users) {
+    const tbody = document.getElementById('userTableBody');
+    tbody.innerHTML = users.map(u => `
+        <tr>
+          <td data-label="ID">${u.id}</td>
+          <td data-label="Nazwa użytkownika">${u.username}</td>
+          <td data-label="Email">${u.email}</td>
+          <td data-label="Data urodzenia">${u.birthdate}</td>
+          <td data-label="Płeć">${u.gender}</td>
+          <td data-label="Rola">${u.role}</td>
+          <td data-label="Akcje">
+            <button onclick="deleteUser(${u.id})">Usuń</button>
+            <button onclick="toggleRole(${u.id})">Zmień rolę</button>
+          </td>
+        </tr>
+      `).join('');
+}
+
+function filterUsers() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = users.filter(u =>
+        u.username.toLowerCase().includes(search) ||
+        u.email.toLowerCase().includes(search)
+    );
+    renderTable(filtered);
 }
 
 // Usuwanie
@@ -46,6 +58,13 @@ async function toggleRole(id) {
     } else {
         alert("Błąd");
     }
+}
+
+async function forAdminPage() {
+    user = await loggedUser();
+    if (!user) return;
+
+    loadUsers();
 }
 
 // Sprawdza czy uzytkownik jest juz zalogowany

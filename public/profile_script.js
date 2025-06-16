@@ -84,6 +84,17 @@ function translate(value) {
 async function changeUsername() {
     const newUsername = (document.getElementById('newUsername').value || '').trim();
 
+    if (newUsername.length < 3 || newUsername.length > 20) {
+        alert("Nazwa użytkownika musi mieć od 3 do 20 znaków.");
+        return;
+    }
+
+    const ux = /^[a-zA-Z0-9._]+$/;
+    if (!ux.test(newUsername)) {
+        alert("Nazwa użytkownika może zawierać tylko litery, cyfry oraz zkaki: [ . , _ ]");
+        return;
+    }
+
     const res = await fetch(`/api/user/username`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +103,7 @@ async function changeUsername() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('usernameForm').reset();
         document.getElementById('usernameForm').style.display = 'none';
@@ -119,7 +130,7 @@ async function changeEmail() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('emailForm').reset();
         document.getElementById('emailForm').style.display = 'none';
@@ -149,7 +160,7 @@ async function changePassword() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('passwordForm').reset();
         document.getElementById('passwordForm').style.display = 'none';
@@ -170,7 +181,7 @@ async function changeBirthdate() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('birthdateForm').reset();
         document.getElementById('birthdateForm').style.display = 'none';
@@ -191,7 +202,7 @@ async function changeHeight() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('heightForm').reset();
         document.getElementById('heightForm').style.display = 'none';
@@ -212,7 +223,7 @@ async function changeWeight() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('weightForm').reset();
         document.getElementById('weightForm').style.display = 'none';
@@ -233,7 +244,7 @@ async function changeGender() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('genderForm').reset();
         document.getElementById('genderForm').style.display = 'none';
@@ -254,7 +265,7 @@ async function changeActivityLevel() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('activityLevelForm').reset();
         document.getElementById('activityLevelForm').style.display = 'none';
@@ -275,7 +286,7 @@ async function changeGoal() {
     info = await res.json();
 
     if (res.ok) {
-        alert(info.message || "Wystąpił błąd");
+        alert(info.message || "Udało się");
         forProfilePage();
         document.getElementById('goalForm').reset();
         document.getElementById('goalForm').style.display = 'none';

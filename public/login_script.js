@@ -199,7 +199,9 @@ async function Login() {
         form.reset();
         location.href = 'index.html';
     }
-    else {
+    else if (res.status === 400) {
+        message.innerHTML = (info.message || "Wystąpił błąd");
+    } else {
         message.innerHTML = (info.message || "Wystąpił błąd");
         form.reset();
     }
@@ -231,9 +233,21 @@ async function Register() {
     const activityLevel = (formData.get('activityLevel') || '').trim();
     const goal = (formData.get('goal') || '').trim();
 
+    // Sprawdzanie nazwy uzytkownika
+    if (username.length < 3 || username.length > 20) {
+        message.innerHTML = "Nazwa użytkownika musi mieć od 3 do 20 znaków.";
+        return;
+    }
+
+    const ux = /^[a-zA-Z0-9._]+$/;
+    if (!ux.test(username)) {
+        message.innerHTML = "Nazwa użytkownika może zawierać tylko litery, cyfry oraz zkaki: [ . , _ ]";
+        return;
+    }
+
     // Sprawdzanie emaila
-    const x = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!x.test(String(email).toLowerCase())) {
+    const ex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!ex.test(String(email).toLowerCase())) {
         message.innerHTML = "Niepoprawny adres e-mail";
         return;
     }
@@ -252,6 +266,7 @@ async function Register() {
         message.innerHTML = "Hasło musi zawierać 8 znaków w tym: cyfrę oraz dużą i małą literę";
         return;
     }
+
 
     const data = {
         username: username,
@@ -274,7 +289,7 @@ async function Register() {
     info = await res.json();
 
     if (res.ok) {
-        message.innerHTML = (info.message || "Wystąpił błąd");
+        message.innerHTML = (info.message || "Udało się");
         form.reset();
         renderLoginForm();
     }
