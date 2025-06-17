@@ -1,131 +1,49 @@
-// public/przepisy.js
+let recipes = [];
+let currentUser = null;
 
-const recipes = [
-    // Wegetariańskie
-    {
-        name: "Owsianka z owocami i orzechami",
-        desc: "Płatki owsiane gotowane na mleku, z dodatkiem świeżych owoców i orzechów. Idealne śniadanie na dobry początek dnia.",
-        author: "Marek Triceps",
-        date: "2025-06-02",
-        tags: ["owsianka", "śniadanie", "fit", "orzechy"],
-        diet: "wegetariańska",
-        img: "public/owsianka.png"
-    },
-    {
-        name: "Zupa krem z dyni",
-        desc: "Dynia, marchew, mleczko kokosowe, przyprawy. Idealna na jesienne dni.",
-        author: "Anna Dietetyk",
-        date: "2025-06-05",
-        tags: ["zupa", "dynia", "wegetariańska", "obiad"],
-        diet: "wegetariańska",
-        img: "public/zupa_dyniowa.png"
-    },
-    {
-        name: "Makaron z pesto i pomidorkami",
-        desc: "Pełnoziarnisty makaron, pesto bazyliowe, pomidorki koktajlowe, parmezan.",
-        author: "Kasia Runner",
-        date: "2025-06-06",
-        tags: ["makaron", "obiad", "wegetariańska", "pesto"],
-        diet: "wegetariańska",
-        img: "public/makaron_pesto.png"
-    },
-    {
-        name: "Placki z cukinii",
-        desc: "Cukinia, jajko, mąka owsiana, przyprawy. Lekka i szybka przekąska.",
-        author: "Janek Fizjo",
-        date: "2025-06-07",
-        tags: ["cukinia", "placki", "fit", "wegetariańska"],
-        diet: "wegetariańska",
-        img: "public/placki_cukinia.png"
-    },
+// Pobierz aktualnie zalogowanego użytkownika z backendu (na podstawie sesji)
+function fetchCurrentUser() {
+    return fetch('/api/current_user', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            currentUser = data.username;
+        });
+}
 
-    // Low Carb
-    {
-        name: "Sałatka z kurczakiem i awokado",
-        desc: "Grillowany kurczak, świeże awokado, rukola, pomidorki koktajlowe, oliwa z oliwek.",
-        author: "Anna Dietetyk",
-        date: "2025-06-01",
-        tags: ["kurczak", "sałatka", "lunch", "fit"],
-        diet: "low carb",
-        img: "public/kurczak_awokado.png"
-    },
-    {
-        name: "Omlet białkowy z warzywami",
-        desc: "Białka jaj, szpinak, papryka, cebula. Lekki i pożywny posiłek po treningu.",
-        author: "Janek Fizjo",
-        date: "2025-06-04",
-        tags: ["omlet", "kolacja", "białko", "warzywa"],
-        diet: "low carb",
-        img: "public/omlet.png"
-    },
-    {
-        name: "Burger bez bułki",
-        desc: "Mielona wołowina, ser, sałata, pomidor, cebula. Wszystko zawinięte w liść sałaty.",
-        author: "Marek Triceps",
-        date: "2025-06-08",
-        tags: ["burger", "lowcarb", "kolacja"],
-        diet: "low carb",
-        img: "public/burger_salata.png"
-    },
-    {
-        name: "Tortilla z jajecznicą i szpinakiem",
-        desc: "Jajka, szpinak, cebulka, zawinięte w pełnoziarnistą tortillę.",
-        author: "Anna Dietetyk",
-        date: "2025-06-09",
-        tags: ["śniadanie", "lowcarb", "jajka"],
-        diet: "low carb",
-        img: "public/tortilla_jajka.png"
-    },
+// Komunikat o sukcesie
+function showRecipeSuccess(msg) {
+    const el = document.getElementById('recipeSuccess');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.opacity = '1';
+    setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => { el.style.display = 'none'; }, 500);
+    }, 2000);
+}
 
-    // Peskatariańskie
-    {
-        name: "Pieczony łosoś z warzywami",
-        desc: "Łosoś pieczony z brokułami, marchewką i ziemniakami. Bogaty w białko i omega-3.",
-        author: "Kasia Runner",
-        date: "2025-06-03",
-        tags: ["łosoś", "obiad", "omega3", "fit"],
-        diet: "peskatariańska",
-        img: "public/losos.png"
-    },
-    {
-        name: "Sałatka z tuńczykiem i jajkiem",
-        desc: "Tuńczyk, jajko na twardo, sałata rzymska, oliwki, pomidory.",
-        author: "Janek Fizjo",
-        date: "2025-06-10",
-        tags: ["tuńczyk", "jajko", "sałatka"],
-        diet: "peskatariańska",
-        img: "public/salatka_tunczyk.png"
-    },
-    {
-        name: "Makrela z warzywami na parze",
-        desc: "Makrela gotowana na parze z warzywami: brokuł, kalafior, marchew.",
-        author: "Marek Triceps",
-        date: "2025-06-11",
-        tags: ["makrela", "parowane", "obiad"],
-        diet: "peskatariańska",
-        img: "public/makrela.png"
-    },
-    {
-        name: "Jajka faszerowane łososiem",
-        desc: "Jajka gotowane na twardo faszerowane pastą z wędzonego łososia i koperku.",
-        author: "Anna Dietetyk",
-        date: "2025-06-12",
-        tags: ["jajka", "łosoś", "przekąska"],
-        diet: "peskatariańska",
-        img: "public/jajka_losos.png"
-    }
-];
+// Pobierz przepisy z backendu
+function fetchRecipes() {
+    fetch('/api/recipes', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            recipes = data;
+            renderRecipes();
+        });
+}
 
+// Renderowanie kart przepisów
 function renderRecipes(filter = "", selectedDiet = "") {
     const recipeList = document.getElementById('recipeList');
     recipeList.innerHTML = "";
 
     const filtered = recipes.filter(recipe => {
-        const matchesText = recipe.name.toLowerCase().includes(filter) ||
-            recipe.desc.toLowerCase().includes(filter) ||
-            recipe.tags.some(tag => tag.includes(filter));
-        const matchesDiet = selectedDiet === "" || recipe.diet === selectedDiet;
-        return matchesText && matchesDiet;
+        const matchesText =
+            (recipe.title && recipe.title.toLowerCase().includes(filter)) ||
+            (recipe.ingredients && recipe.ingredients.toLowerCase().includes(filter)) ||
+            (recipe.instructions && recipe.instructions.toLowerCase().includes(filter));
+        return matchesText && (selectedDiet === "" || (recipe.diet && recipe.diet === selectedDiet));
     });
 
     if (filtered.length === 0) {
@@ -137,32 +55,152 @@ function renderRecipes(filter = "", selectedDiet = "") {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
-            <img class="recipe-img" src="${recipe.img}" alt="${recipe.name}">
+            <img class="recipe-img" src="${recipe.image_path && recipe.image_path !== '' ? recipe.image_path : 'public/default.png'}" alt="${recipe.title}">
             <div class="recipe-content">
-                <div class="recipe-title">${recipe.name}</div>
-                <div class="recipe-meta">autor: ${recipe.author} | ${recipe.date}</div>
-                <div class="recipe-desc">${recipe.desc}</div>
+                <div class="recipe-title">${recipe.title}</div>
+                <div class="recipe-meta">autor: ${recipe.author || 'Nieznany'} | ${recipe.date || ''}</div>
+                <div class="recipe-desc">
+                    ${(recipe.ingredients || '').length > 80 
+                        ? (recipe.ingredients.substring(0, 80) + '...') 
+                        : recipe.ingredients}
+                </div>
                 <div class="recipe-tags">
-                    ${recipe.tags.map(tag => `<span class="recipe-tag">#${tag}</span>`).join(' ')}
-                    <span class="recipe-tag">#${recipe.diet}</span>
+                    ${recipe.diet ? `<span class="recipe-tag">#${recipe.diet}</span>` : ''}
                 </div>
             </div>
         `;
+        card.addEventListener('click', () => showRecipeDetail(recipe.id));
         recipeList.appendChild(card);
     });
 }
 
+// Obsługa modali, filtrów i formularzy
 document.addEventListener('DOMContentLoaded', () => {
+    fetchCurrentUser().then(() => {
+        fetchRecipes();
+    });
+
     const searchBox = document.getElementById('searchBox');
     const dietFilter = document.getElementById('dietFilter');
+    const addRecipeBtn = document.getElementById('addRecipeBtn');
+    const addRecipeModal = document.getElementById('addRecipeModal');
+    const addRecipeForm = document.getElementById('addRecipeForm');
+    const recipeDetailModal = document.getElementById('recipeDetailModal');
+    const closeDetailModal = document.getElementById('closeDetailModal');
 
     function updateFilter() {
-        const text = searchBox.value.trim().toLowerCase();
-        const diet = dietFilter.value;
+        const text = searchBox ? searchBox.value.trim().toLowerCase() : "";
+        const diet = dietFilter ? dietFilter.value : "";
         renderRecipes(text, diet);
     }
 
-    renderRecipes();
-    searchBox.addEventListener('input', updateFilter);
-    dietFilter.addEventListener('change', updateFilter);
+    if (searchBox) searchBox.addEventListener('input', updateFilter);
+    if (dietFilter) dietFilter.addEventListener('change', updateFilter);
+
+    if (addRecipeBtn) {
+        addRecipeBtn.onclick = () => {
+            addRecipeModal.style.display = 'block';
+        };
+    }
+    if (addRecipeModal) {
+        addRecipeModal.onclick = (e) => {
+            if (e.target === addRecipeModal) addRecipeModal.style.display = 'none';
+        };
+    }
+    if (addRecipeForm) {
+        addRecipeForm.onsubmit = function(e) {
+            e.preventDefault();
+            const form = e.target;
+
+            fetch('/api/recipes', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: form.title.value,
+                    ingredients: form.ingredients.value,
+                    instructions: form.instructions.value
+                })
+            }).then(res => {
+                if (res.status === 401) {
+                    alert("Musisz być zalogowany, aby dodać przepis!");
+                    return;
+                }
+                form.reset();
+                addRecipeModal.style.display = 'none';
+                showRecipeSuccess("Przepis został dodany!");
+                fetchRecipes();
+            });
+        };
+    }
+    if (closeDetailModal) {
+        closeDetailModal.onclick = () => {
+            recipeDetailModal.style.display = 'none';
+        };
+    }
 });
+
+// Szczegóły przepisu i obsługa usuwania
+function showRecipeDetail(id) {
+    fetch(`/api/recipes/${id}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(recipe => {
+            document.getElementById('detailTitle').textContent = recipe.title;
+            document.getElementById('detailIngredients').textContent = recipe.ingredients;
+            document.getElementById('detailInstructions').textContent = recipe.instructions;
+            renderComments(recipe.comments, id);
+            document.getElementById('recipeDetailModal').style.display = 'block';
+
+            // Obsługa przycisku usuwania
+            const deleteBtn = document.getElementById('deleteRecipeBtn');
+            if (deleteBtn) {
+                if (currentUser && recipe.author && currentUser === recipe.author) {
+                    deleteBtn.style.display = 'block';
+                    deleteBtn.onclick = function() {
+                        if (confirm('Czy na pewno chcesz usunąć ten przepis?')) {
+                            fetch(`/api/recipes/${id}`, { method: 'DELETE', credentials: 'include' })
+                                .then(res => res.json())
+                                .then(() => {
+                                    document.getElementById('recipeDetailModal').style.display = 'none';
+                                    fetchRecipes();
+                                });
+                        }
+                    };
+                } else {
+                    deleteBtn.style.display = 'none';
+                    deleteBtn.onclick = null;
+                }
+            }
+
+            document.getElementById('addCommentForm').onsubmit = function(e) {
+                e.preventDefault();
+                const form = e.target;
+                fetch(`/api/recipes/${id}/comments`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        author: form.author ? form.author.value : "",
+                        comment: form.comment.value
+                    })
+                }).then(() => {
+                    form.reset();
+                    fetch(`/api/recipes/${id}/comments`, { credentials: 'include' })
+                        .then(res => res.json())
+                        .then(comments => renderComments(comments, id));
+                });
+            };
+        });
+}
+
+// Renderowanie komentarzy
+function renderComments(comments, recipeId) {
+    const commentsList = document.getElementById('commentsList');
+    commentsList.innerHTML = '';
+    comments.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'comment';
+        div.innerHTML = `<strong>${c.author || 'Anonim'}:</strong> ${c.comment} <span style="color:#888;font-size:0.9em;">${c.date || ''}</span>`;
+        commentsList.appendChild(div);
+    });
+}

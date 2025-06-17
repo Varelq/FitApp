@@ -523,6 +523,114 @@ app.put('/api/user/role/:id', requireRole('admin'), (req, res) => {
     });
 });
 
+// --- Recipes & Comments API ---
+
+// Create recipes and comments tables if they do not exist
+db.run(`
+    CREATE TABLE IF NOT EXISTS recipes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        ingredients TEXT NOT NULL,
+        instructions TEXT NOT NULL,
+        author TEXT,
+        date TEXT,
+        image_path TEXT
+    )
+`);
+db.run(`
+    CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        recipe_id INTEGER NOT NULL,
+        author TEXT,
+        comment TEXT NOT NULL,
+        date TEXT,
+        FOREIGN KEY(recipe_id) REFERENCES recipes(id)
+    )
+`);
+
+// Add a new recipe
+app.post('/api/recipes', (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: 'Musisz się zalogować' });
+
+    const { title, ingredients, instructions } = req.body;
+    const author = req.session.user.username; // <-- NAZWA Z SESJI!
+    const date = new Date().toISOString().split('T')[0];
+    db.run(
+        `INSERT INTO recipes (title, ingredients, instructions, author, date) VALUES (?, ?, ?, ?, ?)`,
+        [title, ingredients, instructions, author, date],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id: this.lastID });
+        }
+    );
+});
+
+
+// Get all recipes
+app.get('/api/recipes', (req, res) => {
+    db.all(`SELECT * FROM recipes ORDER BY date DESC`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// Get a single recipe with comments
+app.get('/api/recipes/:id', (req, res) => {
+    const recipeId = req.params.id;
+    db.get(`SELECT * FROM recipes WHERE id = ?`, [recipeId], (err, recipe) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!recipe) return res.status(404).json({ error: 'Recipe not found' });
+        db.all(`SELECT * FROM comments WHERE recipe_id = ? ORDER BY date ASC`, [recipeId], (err, comments) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ ...recipe, comments });
+        });
+    });
+});
+
+// Add a comment to a recipe
+app.post('/api/recipes/:id/comments', (req, res) => {
+    const { author, comment } = req.body;
+    const recipe_id = req.params.id;
+    const date = new Date().toISOString().split('T')[0];
+    db.run(
+        `INSERT INTO comments (recipe_id, author, comment, date) VALUES (?, ?, ?, ?)`,
+        [recipe_id, author, comment, date],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id: this.lastID });
+        }
+    );
+});
+
+// Get comments for a specific recipe
+app.get('/api/recipes/:id/comments', (req, res) => {
+    const recipe_id = req.params.id;
+    db.all(`SELECT * FROM comments WHERE recipe_id = ? ORDER BY date ASC`, [recipe_id], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// Endpoint zwracający aktualnego użytkownika na podstawie sesji
+app.get('/api/current_user', (req, res) => {
+    if (req.session && req.session.user && req.session.user.username) {
+        res.json({ username: req.session.user.username });
+    } else {
+        res.json({ username: null });
+    }
+});
+
+
+// Usuwanie przepisu po id
+app.delete('/api/recipes/:id', (req, res) => {
+    const recipeId = req.params.id;
+    db.run(`DELETE FROM recipes WHERE id = ?`, [recipeId], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(200).json({ deleted: this.changes });
+    });
+});
+
+
 // Sprawdza role
 function requireRole(role) {
     return (req, res, next) => {
@@ -678,6 +786,7 @@ app.get('/blog.html', (req, res) => {
 app.get('/przepisy.html', (req, res) => {
     res.sendFile(path.join(__dirname, '/przepisy.html'));
 });
+
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running at http://localhost:${port}`);

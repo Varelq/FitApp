@@ -105,6 +105,20 @@ main {
     margin-right: 4px;
     margin-bottom: 2px;
 }
+.success-message {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1.5px solid #4caf50;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px auto 18px auto;
+    max-width: 400px;
+    text-align: center;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+    transition: opacity 0.3s;
+}
+
 footer {
     text-align: center;
     font-size: 0.95em;
@@ -197,6 +211,87 @@ button .icon {
     align-items: center;
 }
 
+/* MODAL: szczegóły przepisu */
+#recipeDetailModal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(33, 33, 33, 0.55);
+    align-items: center;
+    justify-content: center;
+}
+#recipeDetailModal .recipe-detail-content {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 520px;
+    margin: 40px auto;
+    padding: 32px 28px 24px 28px;
+    box-shadow: 0 6px 36px rgba(76,175,80,0.13), 0 2px 8px rgba(0,0,0,0.10);
+    position: relative;
+}
+#closeDetailModal {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: none;
+    color: #2e7d32;
+    border: none;
+    font-size: 1.1em;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 3px 8px;
+}
+#detailTitle {
+    font-size: 1.4em;
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+#detailIngredients, #detailInstructions {
+    background: #f1f8e9;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 0 0 14px 0;
+    font-size: 1em;
+    color: #333;
+    white-space: pre-wrap;
+}
+.comments-section {
+    margin-top: 18px;
+}
+.comment {
+    background: #e8f5e9;
+    border-radius: 7px;
+    padding: 7px 12px;
+    margin-bottom: 7px;
+    font-size: 0.98em;
+}
+.comment-form textarea,
+.comment-form input[type="text"] {
+    width: 100%;
+    border: 2px solid #4caf50;
+    border-radius: 7px;
+    padding: 9px 12px;
+    margin-bottom: 7px;
+    font-size: 1em;
+    font-family: inherit;
+}
+.comment-form textarea:focus,
+.comment-form input[type="text"]:focus {
+    border: 2px solid #388e3c;
+    outline: none;
+}
+.comment-form button {
+    width: 100%;
+    margin: 0;
+}
+
+/* Domyślne zdjęcie dla przepisów użytkownika */
+.recipe-img {
+    background: #e8f5e9 url('public/default_recipe_user.png') center/50px 50px no-repeat;
+}
+
+/* Responsive modal */
 @media (max-width: 700px) {
     header h1 {
         font-size: 1.5em;
@@ -210,5 +305,9 @@ button .icon {
     .recipes-grid {
         grid-template-columns: 1fr;
         gap: 18px;
+    }
+    #recipeDetailModal .recipe-detail-content {
+        max-width: 98vw;
+        padding: 18px 6vw 18px 6vw;
     }
 }
