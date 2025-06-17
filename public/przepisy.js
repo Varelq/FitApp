@@ -1,12 +1,14 @@
 let recipes = [];
 let currentUser = null;
+let currentUserRole = null;
 
-// Pobierz aktualnie zalogowanego użytkownika z backendu (na podstawie sesji)
+// Pobierz aktualnego użytkownika i jego rolę z backendu (na podstawie sesji)
 function fetchCurrentUser() {
     return fetch('/api/current_user', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
             currentUser = data.username;
+            currentUserRole = data.role;
         });
 }
 
@@ -55,7 +57,7 @@ function renderRecipes(filter = "", selectedDiet = "") {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
-            <img class="recipe-img" src="${recipe.image_path && recipe.image_path !== '' ? recipe.image_path : 'public/default.png'}" alt="${recipe.title}">
+            <img class="recipe-img" src="${recipe.image_path || 'public/default_recipe_user.png'}" alt="${recipe.title}">
             <div class="recipe-content">
                 <div class="recipe-title">${recipe.title}</div>
                 <div class="recipe-meta">autor: ${recipe.author || 'Nieznany'} | ${recipe.date || ''}</div>
@@ -151,19 +153,22 @@ function showRecipeDetail(id) {
             renderComments(recipe.comments, id);
             document.getElementById('recipeDetailModal').style.display = 'block';
 
-            // Obsługa przycisku usuwania
+            // Prosta logika: moderator lub autor widzi przycisk "Usuń"
             const deleteBtn = document.getElementById('deleteRecipeBtn');
             if (deleteBtn) {
-                if (currentUser && recipe.author && currentUser === recipe.author) {
+                const isOwner = currentUser && recipe.author && currentUser === recipe.author;
+                const isModerator = currentUserRole === 'moderator';
+                if (isOwner || isModerator) {
                     deleteBtn.style.display = 'block';
                     deleteBtn.onclick = function() {
                         if (confirm('Czy na pewno chcesz usunąć ten przepis?')) {
-                            fetch(`/api/recipes/${id}`, { method: 'DELETE', credentials: 'include' })
-                                .then(res => res.json())
-                                .then(() => {
-                                    document.getElementById('recipeDetailModal').style.display = 'none';
-                                    fetchRecipes();
-                                });
+                            fetch(`/api/recipes/${id}`, { 
+                                method: 'DELETE', 
+                                credentials: 'include' 
+                            }).then(() => {
+                                document.getElementById('recipeDetailModal').style.display = 'none';
+                                fetchRecipes();
+                            });
                         }
                     };
                 } else {
@@ -204,3 +209,4 @@ function renderComments(comments, recipeId) {
         commentsList.appendChild(div);
     });
 }
+    

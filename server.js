@@ -613,23 +613,39 @@ app.get('/api/recipes/:id/comments', (req, res) => {
 
 // Endpoint zwracający aktualnego użytkownika na podstawie sesji
 app.get('/api/current_user', (req, res) => {
-    if (req.session && req.session.user && req.session.user.username) {
-        res.json({ username: req.session.user.username });
+    if (req.session && req.session.user) {
+        res.json({
+            username: req.session.user.username,
+            role: req.session.user.role
+        });
     } else {
-        res.json({ username: null });
+        res.json({ username: null, role: null });
     }
 });
 
 
 // Usuwanie przepisu po id
 app.delete('/api/recipes/:id', (req, res) => {
+    if (!req.session.user) return res.sendStatus(401); // Not logged in
+
+    const { username, role } = req.session.user;
     const recipeId = req.params.id;
-    db.run(`DELETE FROM recipes WHERE id = ?`, [recipeId], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.status(200).json({ deleted: this.changes });
+
+    db.get('SELECT author FROM recipes WHERE id = ?', [recipeId], (err, row) => {
+        if (err || !row) return res.sendStatus(404);
+
+        // Allow if moderator or author
+        if (role === 'moderator' || row.author === username) {
+            db.run('DELETE FROM recipes WHERE id = ?', [recipeId], function(err2) {
+                if (err2) return res.status(500).json({ error: err2.message });
+                res.status(200).json({ deleted: this.changes });
+            });
+        } else {
+            res.sendStatus(403); // Forbidden
+        }
     });
 });
-
+    
 
 // Sprawdza role
 function requireRole(role) {
