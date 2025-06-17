@@ -22,7 +22,7 @@
                 <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span> Administrowanie</button></div>
                 <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span> Profil</button></div>
             </div>
-          </div>
+        </div>
         <div class="header-left" onclick="location.href='index.html'">
             <div class="title-wrapper">
                 <div class="line"></div>
@@ -38,14 +38,24 @@
             <button onclick="location.href='licznik.html'">Kalkulator BMR</button>
             <button onclick="location.href='przepisy.html'">Przepisy</button>
         </div>
-      </header>
+    </header>
 
     <main>
         <section class="recipes-hero">
             <h2>Przepisy Fitness</h2>
             <p>Odkryj zdrowe, pyszne i szybkie przepisy na każdą okazję. Wyszukaj, filtruj i znajdź inspirację na swój kolejny posiłek!</p>
-            <input type="text" id="searchBox" placeholder="Szukaj przepisu, np. kurczak, śniadanie...">
+            
+            <div class="filter-controls">
+                <input type="text" id="searchBox" placeholder="Szukaj przepisu, np. kurczak, śniadanie...">
+                <select id="dietFilter">
+                    <option value="">Wszystkie diety</option>
+                    <option value="wegetariańska">Wegetariańska</option>
+                    <option value="low carb">Low Carb</option>
+                    <option value="peskatariańska">Peskatariańska</option>
+                </select>
+            </div>
         </section>
+
         <section class="recipes-grid" id="recipeList">
             <!-- JS will render recipe cards here -->
         </section>
