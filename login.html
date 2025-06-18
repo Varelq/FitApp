@@ -142,6 +142,31 @@
             color: var(--primary-green);
         }
 
+        .captcha-image {
+            display: block;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #captchaMessage {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #captchaInput {
+            display: block;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 20px 10px;
@@ -187,6 +212,18 @@
             <button type="button" onclick="renderSendEmailForm()">Resetuj hasło</button>
             <button type="button" onclick="renderRegisterForm()">Zarejestruj się</button>
         </form>
+    </div>
+
+    <div id="captchaBox" style="display: none;">
+        <div id="formContainer">
+            <div id="formTitle">Weryfikacja CAPTCHA</div>
+            <p>Aby kontynuować, wpisz znaki widoczne na obrazku.</p>
+            <img src="public/captcha.png" class="captcha-image" width="300" alt="CAPTCHA">
+            <p>Obrazek zawiera 9 znaków.</p>
+            <input type="text" id="captchaInput" placeholder="Wpisz znaki z obrazka" required />
+            <button onclick="checkCaptcha()">Kontynuuj</button>
+            <p class="message" id="captchaMessage"></p>
+        </div>
     </div>
 
     <script src="/public/login_script.js"></script>

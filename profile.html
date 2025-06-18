@@ -135,6 +135,127 @@
             background-color: var(--primary-dark);
         }
 
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px 24px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content h3 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: #e63946;
+            text-align: center;
+        }
+
+        .modal-text {
+            font-size: 1rem;
+            color: #555;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .modal-input {
+            padding: 14px 16px;
+            font-size: 1.1rem;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .modal-button {
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            min-width: 120px;
+        }
+
+        .modal-button.cancel {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #999;
+        }
+
+        .modal-button.delete {
+            background-color: #e63946;
+            color: white;
+        }
+
+        .modal-button.delete:hover {
+            background-color: #c92a36;
+        }
+
+        .delete-account-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .delete-account-button {
+            background-color: #e63946;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        }
+
+        .delete-account-button:hover {
+            background-color: #c92a36;
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 600px) {
             body {
                 font-size: var(--mobile-font-size);
@@ -180,6 +301,29 @@
             .top-button button {
                 font-size: 20px;
                 padding: 14px 26px;
+            }
+
+            .modal-content {
+                padding: 24px 18px;
+                gap: 16px;
+            }
+
+            .modal-content h3 {
+                font-size: 1.4rem;
+            }
+
+            .modal-input {
+                font-size: 1rem;
+            }
+
+            .modal-button {
+                width: 100%;
+            }
+
+            .delete-account-button {
+                width: 100%;
+                font-size: 20px;
+                padding: 18px 0;
             }
         }
     </style>
@@ -300,7 +444,7 @@
             <button type="submit">Zapisz</button>
         </form>
 
-        <!--Cel -->
+        <!-- Cel -->
         <div class="profile-row">
             <div class="profile-label">Cel:</div>
             <div class="profile-value" id="currentGoal"></div>
@@ -315,6 +459,24 @@
             </select>
             <button type="submit">Zapisz</button>
         </form>
+
+        <!-- Usuwanie konta -->
+        <div class="delete-account-wrapper">
+            <button onclick="showDeleteModal()" class="delete-account-button">Usuń konto</button>
+        </div>
+
+        <div id="deleteModal" class="modal-overlay">
+            <div class="modal-content">
+                <h3>Usuń konto</h3>
+                <p class="modal-text">Czy na pewno chcesz usunąć konto? Ta operacja jest nieodwracalna. Wprowadź hasło,
+                    aby potwierdzić:</p>
+                <input type="password" id="deletePassword" placeholder="Wprowadź hasło" class="modal-input" required />
+                <div class="modal-actions">
+                    <button onclick="hideDeleteModal()" class="modal-button cancel">Anuluj</button>
+                    <button onclick="deleteAccount()" class="modal-button delete">Usuń konto</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/public/profile_script.js"></script>
