@@ -5,6 +5,7 @@ const session = require('express-session');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const crypto = require('crypto');
 
@@ -12,6 +13,7 @@ const saltRounds = 10;
 const app = express();
 const port = 3000;
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
