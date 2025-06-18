@@ -160,7 +160,7 @@ footer {
 }
 
 /* Enhanced Button Styles */
-button,
+.button-rep,
 input[type="button"],
 input[type="submit"] {
     background: linear-gradient(90deg, #43a047 0%, #66bb6a 100%);
@@ -179,7 +179,7 @@ input[type="submit"] {
     font-weight: 500;
 }
 
-button:hover,
+.button-rep:hover,
 input[type="button"]:hover,
 input[type="submit"]:hover {
     background: linear-gradient(90deg, #388e3c 0%, #43a047 100%);
@@ -187,7 +187,7 @@ input[type="submit"]:hover {
     transform: translateY(-2px) scale(1.03);
 }
 
-button:active,
+.button-rep:active,
 input[type="button"]:active,
 input[type="submit"]:active {
     background: #388e3c;
@@ -196,7 +196,7 @@ input[type="submit"]:active {
 }
 
 /* Optional: Icon Button Tuning */
-button .icon {
+.button-rep .icon {
     margin-right: 7px;
     font-size: 1.1em;
     vertical-align: middle;
