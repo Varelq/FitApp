@@ -116,7 +116,7 @@ function renderVerifyCodeForm(email) {
     const form = document.getElementById("userForm");
     form.innerHTML = `
         <p>Wysłano kod na: <b>${email}</b></p>
-        <input type="text" id="resetCode" placeholder="Wpisz 6-cyfrowy kod" maxlength="6" required /><br><br>
+        <input type="text" id="resetCode" placeholder="Wpisz 32-znakowy kod" maxlength="32" required /><br><br>
         <button type="submit">Zweryfikuj kod</button>
         <button type="button" onclick="renderLoginForm()">Anuluj</button>
     `;
@@ -160,8 +160,7 @@ async function forLoginPage() {
     const formContainer = document.getElementById('formContainer');
     if (formContainer) formContainer.style.display = 'none';
 
-    const message = document.getElementById('message');
-    if (message) message.innerHTML = "Zalogowano";
+    hideCaptcha();
 }
 
 // Logowanie
@@ -195,11 +194,12 @@ async function Login() {
     info = await res.json();
 
     if (res.ok) {
-        forLoginPage();
         form.reset();
-        location.href = 'index.html';
+        message.innerHTML = (info.message || "Wystąpił błąd");
+        document.getElementById('formContainer').style.display = 'none';
+        showCaptcha();
     }
-    else if (res.status === 400) {
+    else if (res.status === 400 || res.status === 429) {
         message.innerHTML = (info.message || "Wystąpił błąd");
     } else {
         message.innerHTML = (info.message || "Wystąpił błąd");
@@ -289,8 +289,8 @@ async function Register() {
     info = await res.json();
 
     if (res.ok) {
-        message.innerHTML = (info.message || "Udało się");
         form.reset();
+        message.innerHTML = (info.message || "Udało się");
         renderLoginForm();
     }
     else {
@@ -329,8 +329,10 @@ async function verifyCode() {
     const code = document.getElementById("resetCode").value.trim();
     const message = document.getElementById("message");
 
-    if (!/^\d{6}$/.test(code)) {
-        message.innerHTML = "Kod musi miec 6 cyfr";
+    console.log([...code].map(c => `${c}(${c.charCodeAt(0)})`).join(", "));
+
+    if (!/^[a-f0-9]{32}$/i.test(code)) {
+        message.innerHTML = "Kod musi mieć 32 znaki szesnastkowe";
         return;
     }
 
@@ -379,6 +381,38 @@ async function changePassword() {
     } else {
         message.innerHTML = (info.message || "Wystąpił błąd");
     }
+}
+
+// Captcha
+async function checkCaptcha() {
+    const correctAnswer = "V6T9JBCDS";
+    const userInput = document.getElementById("captchaInput").value.trim().toUpperCase();
+    const captchaMessage = document.getElementById("captchaMessage");
+    captchaMessage.style.display = "block";
+
+    if (userInput === correctAnswer) {
+        const res = await fetch(`/api/captcha`, { method: 'POST' });
+        info = await res.json();
+
+        if (res.ok) {
+            forLoginPage();
+            captchaMessage.innerHTML = (info.message || "Udało się");
+            location.href = 'index.html';
+        }
+    } else {
+        captchaMessage.textContent = "Incorrect captcha.";
+        captchaMessage.style.color = "red";
+    }
+}
+
+function showCaptcha() {
+    const captchaBox = document.getElementById("captchaBox");
+    captchaBox.style.display = "block";
+}
+
+function hideCaptcha() {
+    const captchaBox = document.getElementById("captchaBox");
+    captchaBox.style.display = "none";
 }
 
 // Sprawdza czy uzytkownik jest juz zalogowany

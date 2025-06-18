@@ -296,6 +296,34 @@ async function changeGoal() {
     }
 }
 
+// Usuwanie konta
+function showDeleteModal() {
+    document.getElementById("deleteModal").style.display = "flex";
+}
+
+function hideDeleteModal() {
+    document.getElementById("deleteModal").style.display = "none";
+}
+
+async function deleteAccount() {
+    const password = (document.getElementById('deletePassword').value || '').trim();
+
+    const res = await fetch('/api/delete/acc', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password })
+    })
+    info = await res.json();
+
+    if (res.ok) {
+        alert(info.message || "Udało się");
+        location.href = 'index.html';
+    }
+    else {
+        alert(info.message || "Wystąpił błąd");
+    }
+}
+
 // Sprawdza czy uzytkownik jest juz zalogowany
 async function loggedUser() {
     const res = await fetch('/api/me', { credentials: 'include' });
