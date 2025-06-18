@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const crypto = require('crypto');
 
 const saltRounds = 10;
 const app = express();
@@ -17,7 +18,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
+    cookie: {
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+        rolling: true
+    }
 }));
 
 // Serve static files from the current directory
@@ -52,7 +57,7 @@ db.run(`
     db.run(`
         CREATE TABLE IF NOT EXISTS rpwd(
         email TEXT,
-        code INTEGER,
+        code TEXT,
         expires DATETIME
         )
         `)
@@ -102,6 +107,11 @@ app.post('/api/register', (req, res) => {
 });
 
 // Logowanie
+const loginAttempts = {};
+
+const MAX_ATTEMPTS = 5;
+const BLOCK_TIME = 5 * 60 * 1000;
+
 app.post('/api/login', (req, res) => {
     const { username: rawUsername, password: rawPassword } = req.body;
 
@@ -114,26 +124,61 @@ app.post('/api/login', (req, res) => {
         if (err) return res.status(500).send(err.message);
         if (!user) return res.status(401).json({ message: 'Nieprawidłowa nazwa użytkownika' });
 
+        const now = Date.now();
+        const attempt = loginAttempts[username];
+
+        if (attempt && attempt.count >= MAX_ATTEMPTS && now - attempt.lastAttempt < BLOCK_TIME) {
+            const waitTime = Math.ceil((BLOCK_TIME - (now - attempt.lastAttempt)) / 1000);
+            return res.status(429).json({ message: `Zbyt wiele prób. Spróbuj za ${waitTime} sekund.` });
+        }
+
         bcrypt.compare(password, user.password, (err, result) => {
             if (err) return res.status(500).send(err.message);
-            if (!result) return res.status(401).json({ message: 'Nieprawidłowe hasło' });
 
-            req.session.user = {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                birthdate: user.birthdate,
-                height: user.height,
-                weight: user.weight,
-                gender: user.gender,
-                activityLevel: user.activityLevel,
-                goal: user.goal
+            if (!result) {
+                if (!loginAttempts[username]) {
+                    loginAttempts[username] = { count: 1, lastAttempt: now };
+                } else {
+                    loginAttempts[username].count += 1;
+                    loginAttempts[username].lastAttempt = now;
+                }
+                return res.status(401).json({ message: 'Nieprawidłowe hasło' });
+            }
+
+            delete loginAttempts[username];
+
+            req.session.auth = {
+                id: user.id
             };
-            return res.status(201).json({ message: 'Zalogowano' });
+
+            return res.status(201).json({ message: 'Poprawne dane logowania' });
         });
     });
 });
+
+// Tworzenie sesii
+app.post('/api/captcha', (req, res) => {
+
+    if (!req.session.auth) return res.status(401).json({ message: 'Nie podano poprawnych danych logowania' });
+
+    db.get(`SELECT * FROM users WHERE id = ?`, [req.session.auth.id], (err, user) => {
+        if (err) return res.status(500).send(err.message);
+
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            birthdate: user.birthdate,
+            height: user.height,
+            weight: user.weight,
+            gender: user.gender,
+            activityLevel: user.activityLevel,
+            goal: user.goal
+        };
+        return res.status(201).json({ message: 'Zalogowano' });
+    });
+})
 
 // Zwraca zalogowanego uzytkownika
 app.get('/api/me', (req, res) => {
@@ -290,7 +335,7 @@ app.post('/api/verifyCode', (req, res) => {
 
             if (!row) return res.status(404).json({ message: 'Kod nie znaleziony lub wygasł' });
 
-            if (parseInt(row.code) === parseInt(code)) {
+            if (row.code === code) {
                 req.session.email.verified = true;
                 db.run(`DELETE FROM rpwd WHERE email = ?`, [email]);
                 return res.status(201).json({ message: 'Kod poprawny' });
@@ -523,6 +568,33 @@ app.put('/api/user/role/:id', requireRole('admin'), (req, res) => {
     });
 });
 
+// Usuwanie konta
+app.delete('/api/delete/acc', (req, res) => {
+    const { password: rawPassword } = req.body;
+
+    const password = verifyPassword(rawPassword, rawPassword);
+
+    if (!(password && password)) return res.status(400).json({ message: 'Niepoprawne dane' });
+
+    if (!req.session.user) return res.status(401).json({ message: 'Musisz się zalogować' });
+
+    db.get(`SELECT * FROM users WHERE id = ?`, [req.session.user.id], (err, user) => {
+        if (err) return res.status(500).send(err.message);
+        if (!user) return res.status(401).json({ message: 'Użytkownik nie istnieje' });
+
+        bcrypt.compare(password, user.password, (err, result) => {
+            if (err) return res.status(500).send(err.message);
+            if (!result) return res.status(401).json({ message: 'Nieprawidłowe hasło' });
+
+            db.run(`DELETE FROM users WHERE id = ?`, [req.session.user.id], (err) => {
+                if (err) return res.status(500).send(err.message);
+                req.session.destroy();
+                return res.status(201).json({ message: 'Usunięto konto' });
+            });
+        });
+    });
+});
+
 // --- Recipes & Comments API ---
 
 // Create recipes and comments tables if they do not exist
@@ -558,7 +630,7 @@ app.post('/api/recipes', (req, res) => {
     db.run(
         `INSERT INTO recipes (title, ingredients, instructions, author, date) VALUES (?, ?, ?, ?, ?)`,
         [title, ingredients, instructions, author, date],
-        function(err) {
+        function (err) {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ id: this.lastID });
         }
@@ -595,7 +667,7 @@ app.post('/api/recipes/:id/comments', (req, res) => {
     db.run(
         `INSERT INTO comments (recipe_id, author, comment, date) VALUES (?, ?, ?, ?)`,
         [recipe_id, author, comment, date],
-        function(err) {
+        function (err) {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ id: this.lastID });
         }
@@ -636,7 +708,7 @@ app.delete('/api/recipes/:id', (req, res) => {
 
         // Allow if moderator or author
         if (role === 'moderator' || row.author === username) {
-            db.run('DELETE FROM recipes WHERE id = ?', [recipeId], function(err2) {
+            db.run('DELETE FROM recipes WHERE id = ?', [recipeId], function (err2) {
                 if (err2) return res.status(500).json({ error: err2.message });
                 res.status(200).json({ deleted: this.changes });
             });
@@ -645,7 +717,7 @@ app.delete('/api/recipes/:id', (req, res) => {
         }
     });
 });
-    
+
 
 // Sprawdza role
 function requireRole(role) {
@@ -673,51 +745,36 @@ db.run(`
     image_path TEXT
   )
 `, (err) => {
-  if (err) {
-    console.error("Błąd tworzenia tabeli:", err.message);
-  } else {
-    // Dodaj 3 przykładowe posty, jeśli tabela jest pusta
-    db.get("SELECT COUNT(*) AS count FROM posts", (err, row) => {
-      if (row.count === 0) {
-        const now = new Date().toISOString().split("T")[0];
-        const samplePosts = [
-          { title: "Pierwszy post", content: "To jest przykładowa treść pierwszego posta.", date: now, image_path: "" },
-          { title: "Drugi post", content: "Drugi post z przykładową zawartością.", date: now, image_path: "" },
-          { title: "Trzeci post", content: "Trzeci post na blogu FitApp.", date: now, image_path: "" },
-        ];
-        const stmt = db.prepare("INSERT INTO posts (title, content, date, image_path) VALUES (?, ?, ?, ?)");
-        samplePosts.forEach(p => stmt.run(p.title, p.content, p.date, p.image_path));
-        stmt.finalize(() => console.log("Dodano przykładowe posty."));
-      }
-    });
-  }
+    if (err) {
+        console.error("Błąd tworzenia tabeli:", err.message);
+    } else {
+        // Dodaj 3 przykładowe posty, jeśli tabela jest pusta
+        db.get("SELECT COUNT(*) AS count FROM posts", (err, row) => {
+            if (row.count === 0) {
+                const now = new Date().toISOString().split("T")[0];
+                const samplePosts = [
+                    { title: "Pierwszy post", content: "To jest przykładowa treść pierwszego posta.", date: now, image_path: "" },
+                    { title: "Drugi post", content: "Drugi post z przykładową zawartością.", date: now, image_path: "" },
+                    { title: "Trzeci post", content: "Trzeci post na blogu FitApp.", date: now, image_path: "" },
+                ];
+                const stmt = db.prepare("INSERT INTO posts (title, content, date, image_path) VALUES (?, ?, ?, ?)");
+                samplePosts.forEach(p => stmt.run(p.title, p.content, p.date, p.image_path));
+                stmt.finalize(() => console.log("Dodano przykładowe posty."));
+            }
+        });
+    }
 });
 
 // API - pobierz wszystkie posty
 app.get("/api/posts", (req, res) => {
-  db.all("SELECT * FROM posts ORDER BY date DESC, id DESC", (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(rows);
-    }
-  });
+    db.all("SELECT * FROM posts ORDER BY date DESC, id DESC", (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(rows);
+        }
+    });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -836,7 +893,7 @@ app.get('/api/userdata', (req, res) => {
         res.json({
             weight: row.weight || null,
             height: row.height || null,
-            age: age, 
+            age: age,
             gender: row.gender || null,
             activityLevel: row.activityLevel || null,
             goal: row.goal || null
@@ -876,7 +933,6 @@ app.get('/blog.html', (req, res) => {
 app.get('/przepisy.html', (req, res) => {
     res.sendFile(path.join(__dirname, '/przepisy.html'));
 });
-
 
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running at http://localhost:${port}`);
@@ -976,7 +1032,7 @@ function verifyOptional(rawBirthdate, height, weight, rawGender, rawActivityLeve
     return { birthdateToSave, heightToSave, weightToSave, genderToSave, activityLevelToSave, goalToSave };
 };
 
-// Generowanie kodu
-function generateResetCode() {
-    return Math.floor(100000 + Math.random() * 900000); // 6-cyfrowy
+// Kod na maila
+function generateResetCode(length = 32) {
+    return crypto.randomBytes(length).toString('hex').slice(0, length);
 }
