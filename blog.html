@@ -1,90 +1,134 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FitApp Blog z Asystentem</title>
   <link rel="stylesheet" href="public/css/style_header.css">
   <link rel="stylesheet" href="public/css/style_blog.css">
+  <script src="/public/blog.js"></script>
+  <script src="/public/header_script.js"></script>
 </head>
+
 <body>
 
-<div class="ad-left">Reklama po lewej stronie</div>
-<div class="ad-right">Reklama po prawej stronie</div>
+  <div class="ad-left">Reklama po lewej stronie</div>
+  <div class="ad-right">Reklama po prawej stronie</div>
 
-<div id="toast-container"></div>
+  <div id="toast-container"></div>
 
-<header>
-  <div class="user-dropdown">
+  <header>
+    <div class="user-dropdown">
       <div class="hamburger" onclick="toggleDropdown()">
         &#9776;
       </div>
       <div class="dropdown-menu" id="userDropdown">
-          <div class="dropdown-username" id="dropdownUsername">Witaj, Użytkowniku</div>
-          <div id="loginButton"><button onclick="location.href='login.html'"> <span class="icon">🔓</span> Logowanie</button></div>
-          <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span> Administrowanie</button></div>
-          <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span> Profil</button></div>
+        <div class="dropdown-username" id="dropdownUsername">Witaj, Użytkowniku</div>
+        <div id="loginButton"><button onclick="location.href='login.html'"> <span class="icon">🔓</span>
+            Logowanie</button></div>
+        <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span>
+            Administrowanie</button></div>
+        <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span>
+            Profil</button></div>
       </div>
     </div>
-  <div class="header-left" onclick="location.href='index.html'">
+    <div class="header-left" onclick="location.href='index.html'">
       <div class="title-wrapper">
-          <div class="line"></div>
-          <div class="title-logo">
-              <img src="/public/logo.png" alt="Logo">
-              <h1><span>Fit</span>App</h1>
-          </div>
-          <div class="line"></div>
+        <div class="line"></div>
+        <div class="title-logo">
+          <img src="/public/logo.png" alt="Logo">
+          <h1><span>Fit</span>App</h1>
+        </div>
+        <div class="line"></div>
       </div>
-  </div>
-  <div class="header-right">
+    </div>
+    <div class="header-right">
       <button onclick="location.href='blog.html'">Blog</button>
       <button onclick="location.href='licznik.html'">Kalkulator BMR</button>
       <button onclick="location.href='przepisy.html'">Przepisy</button>
-  </div>
-</header>
+    </div>
+  </header>
 
-<div class="container">
-  <div class="sidebar-left">
-    <h3>Tematyka</h3>
-    <ul>
-      <li>🏋️‍♂️ Siłownia</li>
-      <li>🥗 Dieta</li>
-      <li>🤸 Fitness</li>
-      <li>❤️‍🔥 Cardio</li>
-      <li>🛌 Regeneracja</li>
-    </ul>
+  <div class="container">
+    <div class="sidebar-left">
+      <h3>Tematyka</h3>
+      <ul>
+        <li>🏋️‍♂️ Siłownia</li>
+        <li>🥗 Dieta</li>
+        <li>🤸 Fitness</li>
+        <li>❤️‍🔥 Cardio</li>
+        <li>🛌 Regeneracja</li>
+      </ul>
+    </div>
+
+    <div class="main" id="posts-container">
+      <!-- Posty w JS -->
+    </div>
+
+    <div class="sidebar-right">
+      <h3>🔥 Trendy</h3>
+      <ul>
+        <li>#Dieta3xZ</li>
+        <li>#HIITczyHIT</li>
+        <li>#StretchingTikTok</li>
+        <li>#SpaDomowe</li>
+        <li>#FitnessNaKacu</li>
+      </ul>
+    </div>
   </div>
 
-  <div class="main" id="posts-container">
-    <!-- Posty w JS -->
+  <!-- Asystent -->
+  <div id="assistant" title="Kliknij, aby rozwinąć asystenta">
+    <div id="assistant-header">
+      <div>🤖 Asystent FitApp</div>
+      <span id="assistant-toggle">+</span>
+    </div>
+    <div id="assistant-content">
+      <textarea id="assistant-input" placeholder="Napisz problem lub pytanie..."></textarea>
+      <button id="assistant-send">Wyślij do eksperta</button>
+      <div id="assistant-response" style="margin-top:10px; font-size: 0.9em; color:#333;"></div>
+    </div>
   </div>
 
-  <div class="sidebar-right">
-    <h3>🔥 Trendy</h3>
-    <ul>
-      <li>#Dieta3xZ</li>
-      <li>#HIITczyHIT</li>
-      <li>#StretchingTikTok</li>
-      <li>#SpaDomowe</li>
-      <li>#FitnessNaKacu</li>
-    </ul>
-  </div>
-</div>
+  <div id="cookie-modal" class="cookie-modal hidden">
+    <div class="cookie-content">
+      <p>
+        Używamy plików cookies, aby zapewnić Ci najlepsze doświadczenia.
+        <a href="polityka.html" target="_blank">Dowiedz się więcej</a>.
+      </p>
 
-<!-- Asystent -->
-<div id="assistant" title="Kliknij, aby rozwinąć asystenta">
-  <div id="assistant-header">
-    <div>🤖 Asystent FitApp</div>
-    <span id="assistant-toggle">+</span>
+      <div class="cookie-options">
+        <label class="cookie-label">
+          <input type="checkbox" id="cookies-necessary" class="cookie-checkbox" checked disabled>
+          Niezbędne (zawsze aktywne)
+        </label>
+        <label class="cookie-label">
+          <input type="checkbox" id="cookies-analytics" class="cookie-checkbox">
+          Analityczne
+        </label>
+        <label class="cookie-label">
+          <input type="checkbox" id="cookies-marketing" class="cookie-checkbox">
+          Marketingowe
+        </label>
+      </div>
+      <div class="cookie-buttons">
+        <button id="accept-necessary">Tylko niezbędne</button>
+        <button id="save-cookies">Zapisz preferencje</button>
+        <button id="accept-cookies">Akceptuję wszystkie</button>
+      </div>
+    </div>
   </div>
-  <div id="assistant-content">
-    <textarea id="assistant-input" placeholder="Napisz problem lub pytanie..."></textarea>
-    <button id="assistant-send">Wyślij do eksperta</button>
-    <div id="assistant-response" style="margin-top:10px; font-size: 0.9em; color:#333;"></div>
-  </div>
-</div>
 
-<script src="/public/header_script.js"></script>
-<script src="/public/blog.js"></script>
+  <footer>
+    <p>&copy; 2025 FitApp ZOO. Wszystkie prawa zastrzeżone.</p>
+    <p>Kontakt: <a href="mailto:fitapp.zdrowie@gmail.com">fitapp.zdrowie@gmail.com</a></p>
+  </footer>
+
+  <div class="banner" onclick="location.href='index.html'">
+    FitApp – Twoja droga do zdrowego stylu życia
+  </div>
+
 </body>
+
 </html>

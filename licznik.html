@@ -15,15 +15,18 @@
     <header>
         <div class="user-dropdown">
             <div class="hamburger" onclick="toggleDropdown()">
-              &#9776;
+                &#9776;
             </div>
             <div class="dropdown-menu" id="userDropdown">
                 <div class="dropdown-username" id="dropdownUsername">Witaj, Użytkowniku</div>
-                <div id="loginButton"><button onclick="location.href='login.html'"> <span class="icon">🔓</span> Logowanie</button></div>
-                <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span> Administrowanie</button></div>
-                <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span> Profil</button></div>
+                <div id="loginButton"><button onclick="location.href='login.html'"> <span class="icon">🔓</span>
+                        Logowanie</button></div>
+                <div id="adminButton"><button onclick="location.href='admin.html'"><span class="icon">🛠️</span>
+                        Administrowanie</button></div>
+                <div id="profileButton"><button onclick="location.href='profile.html'"><span class="icon">👤</span>
+                        Profil</button></div>
             </div>
-          </div>
+        </div>
         <div class="header-left" onclick="location.href='index.html'">
             <div class="title-wrapper">
                 <div class="line"></div>
@@ -39,15 +42,17 @@
             <button onclick="location.href='licznik.html'">Kalkulator BMR</button>
             <button onclick="location.href='przepisy.html'">Przepisy</button>
         </div>
-      </header>
+    </header>
 
     <main class="container">
 
         <section class="left-panel">
             <h1>Sprawdź swoje dzienne zapotrzebowanie kaloryczne (BMR)</h1>
             <p class="bmr-description">
-                Kalkulator BMR (ang. Basal Metabolic Rate) służy do obliczenia podstawowej przemiany materii – czyli ilości kalorii, jaką Twoje ciało 
-                potrzebuje każdego dnia, aby podtrzymać podstawowe funkcje życiowe w stanie spoczynku (oddychanie, krążenie krwi, praca narządów).
+                Kalkulator BMR (ang. Basal Metabolic Rate) służy do obliczenia podstawowej przemiany materii – czyli
+                ilości kalorii, jaką Twoje ciało
+                potrzebuje każdego dnia, aby podtrzymać podstawowe funkcje życiowe w stanie spoczynku (oddychanie,
+                krążenie krwi, praca narządów).
             </p>
             <img src="public/calculator.jpg" alt="Photo" class="bmr-image">
             <h1>Dlaczego warto korzystać z naszego kalkulatora?</h1>
@@ -58,82 +63,118 @@
                 <li>zacząć kontrolować swoją wagę,</li>
                 <li>dobrać odpowiednią dietę,</li>
                 <li>lepiej zrozumieć, ile energii naprawdę potrzebujesz.</li>
-            </ul>  
-            <p class="bmr-description">Dzięki BMR możesz ustalić, ile kalorii powinieneś dostarczać organizmowi, by schudnąć, utrzymać wagę lub zbudować masę – zależnie od 
-                Twojego celu. Wystarczy wpisać kilka podstawowych danych, jak waga, wzrost, wiek, płeć oraz poziom aktywności fizycznej, a kalkulator resztę zrobi za Ciebie.
+            </ul>
+            <p class="bmr-description">Dzięki BMR możesz ustalić, ile kalorii powinieneś dostarczać organizmowi, by
+                schudnąć, utrzymać wagę lub zbudować masę – zależnie od
+                Twojego celu. Wystarczy wpisać kilka podstawowych danych, jak waga, wzrost, wiek, płeć oraz poziom
+                aktywności fizycznej, a kalkulator resztę zrobi za Ciebie.
             </p>
         </section>
 
         <section class="right-panel">
-        <div class="calculator">
-        <h2>Podaj swoje dane aby obliczyć swoje zapotrzebowanie</h2>
-        <label class="bnt-description" for="weight">Waga (kg):</label>
-        <input  type="number" id="weight" required />
+            <div class="calculator">
+                <h2>Podaj swoje dane aby obliczyć swoje zapotrzebowanie</h2>
+                <label class="bnt-description" for="weight">Waga (kg):</label>
+                <input type="number" id="weight" required />
 
-        <label class="bnt-description" for="height">Wzrost (cm):</label>
-        <input type="number" id="height" required />
+                <label class="bnt-description" for="height">Wzrost (cm):</label>
+                <input type="number" id="height" required />
 
-        <label class="bnt-description" for="age">Wiek (lata):</label>
-        <input type="number" id="age" required />
+                <label class="bnt-description" for="age">Wiek (lata):</label>
+                <input type="number" id="age" required />
 
-        <label class="bnt-description" for="gender">Płeć:</label>
-        <div class="gender-buttons">
-            <button type="button" class="gender-btn" data-gender="male" onclick="selectGender(this)">Mężczyzna</button>
-            <button type="button" class="gender-btn" data-gender="female" onclick="selectGender(this)">Kobieta</button>
-        </div>
-        <input type="hidden" id="gender" required/>
+                <label class="bnt-description" for="gender">Płeć:</label>
+                <div class="gender-buttons">
+                    <button type="button" class="gender-btn" data-gender="male"
+                        onclick="selectGender(this)">Mężczyzna</button>
+                    <button type="button" class="gender-btn" data-gender="female"
+                        onclick="selectGender(this)">Kobieta</button>
+                </div>
+                <input type="hidden" id="gender" required />
 
-        <label class="bnt-description" for="activityLevel">Aktywność fizyczna:</label>
-        <div class="activity-buttons">
-            <button type="button" class="activity-btn" data-activity="sedentary" onclick="selectActivity(this)">
-                Bardzo niska, brak wysiłku fizycznego, praca siedząca</button>
-            <button type="button" class="activity-btn" data-activity="light" onclick="selectActivity(this)">
-                Niska, sporadyczna aktywność, 1-2 razy na tydzień</button>
-            <button type="button" class="activity-btn" data-activity="moderate" onclick="selectActivity(this)">
-                Umiarkowana, Treningi o średniej intesywności 2-3 razy w tygodniu</button>
-            <button type="button" class="activity-btn" data-activity="active" onclick="selectActivity(this)">
-                Wysoka, Mocno intesywne treningi nawet do 4 razy w tygodniu</button>
-            <button type="button" class="activity-btn" data-activity="very_active" onclick="selectActivity(this)">
-                Bardzo wysoka, intesywna aktywność cały tydzień, lub minimum 5 dni i dodatkowo praca fizyczna</button>
-        </div>
-        <input type="hidden" id="activityLevel" required/>
+                <label class="bnt-description" for="activityLevel">Aktywność fizyczna:</label>
+                <div class="activity-buttons">
+                    <button type="button" class="activity-btn" data-activity="sedentary" onclick="selectActivity(this)">
+                        Bardzo niska, brak wysiłku fizycznego, praca siedząca</button>
+                    <button type="button" class="activity-btn" data-activity="light" onclick="selectActivity(this)">
+                        Niska, sporadyczna aktywność, 1-2 razy na tydzień</button>
+                    <button type="button" class="activity-btn" data-activity="moderate" onclick="selectActivity(this)">
+                        Umiarkowana, Treningi o średniej intesywności 2-3 razy w tygodniu</button>
+                    <button type="button" class="activity-btn" data-activity="active" onclick="selectActivity(this)">
+                        Wysoka, Mocno intesywne treningi nawet do 4 razy w tygodniu</button>
+                    <button type="button" class="activity-btn" data-activity="very_active"
+                        onclick="selectActivity(this)">
+                        Bardzo wysoka, intesywna aktywność cały tydzień, lub minimum 5 dni i dodatkowo praca
+                        fizyczna</button>
+                </div>
+                <input type="hidden" id="activityLevel" required />
 
-        <label class="bnt-description" for="goal">Twój cel:</label>
-        <div class="goal-buttons">
-            <button type="button" class="goal-btn" data-goal="lose" onclick="selectGoal(this)">
-                Zdrowe zrzucenie masy ciała</button>
-            <button type="button" class="goal-btn" data-goal="maintain" onclick="selectGoal(this)">
-                Utrzymanie obecnej wagi</button>
-            <button type="button" class="goal-btn" data-goal="gain" onclick="selectGoal(this)">
-                Przybranie na wadze, budowa masy mięśniowej</button>
-        </div>
-        <input type="hidden" id="goal" required/>
+                <label class="bnt-description" for="goal">Twój cel:</label>
+                <div class="goal-buttons">
+                    <button type="button" class="goal-btn" data-goal="lose" onclick="selectGoal(this)">
+                        Zdrowe zrzucenie masy ciała</button>
+                    <button type="button" class="goal-btn" data-goal="maintain" onclick="selectGoal(this)">
+                        Utrzymanie obecnej wagi</button>
+                    <button type="button" class="goal-btn" data-goal="gain" onclick="selectGoal(this)">
+                        Przybranie na wadze, budowa masy mięśniowej</button>
+                </div>
+                <input type="hidden" id="goal" required />
 
-        <button class="default-button" onclick="InsertUserData()">Wstaw wartości z danych profilu</button>
-        <div class="result-log-box" id="error-container" style="display: none;">
-            <p id="error-text"></p>
-            <a href='login.html'>Kliknij aby się zalogować</a>
-        </div>
-        <button class="result-button" onclick="submitForm()">Oblicz</button>
+                <button class="default-button" onclick="InsertUserData()">Wstaw wartości z danych profilu</button>
+                <div class="result-log-box" id="error-container" style="display: none;">
+                    <p id="error-text"></p>
+                    <a href='login.html'>Kliknij aby się zalogować</a>
+                </div>
+                <button class="result-button" onclick="submitForm()">Oblicz</button>
 
-        </div>
+            </div>
 
-        <div class="result-box" id="resultbmr" style="display: none;">
-            <h3 id="resulth3">Twoje dzienne zapotrzebowanie kaloryczne</h3>
-            <p id="resultbmrtext">Wynik pojawi się tutaj...</p>
-        </div>
+            <div class="result-box" id="resultbmr" style="display: none;">
+                <h3 id="resulth3">Twoje dzienne zapotrzebowanie kaloryczne</h3>
+                <p id="resultbmrtext">Wynik pojawi się tutaj...</p>
+            </div>
 
-        <div class="result-box" id="resultbmi" style="display: none;">
-            <h3>Twoje BMI wynosi</h3>
-            <p id="resultbmitext">Wynik pojawi się tutaj...</p>
-        </div>
+            <div class="result-box" id="resultbmi" style="display: none;">
+                <h3>Twoje BMI wynosi</h3>
+                <p id="resultbmitext">Wynik pojawi się tutaj...</p>
+            </div>
 
-        </section>    
+        </section>
 
     </main>
 
+    <div id="cookie-modal" class="cookie-modal hidden">
+        <div class="cookie-content">
+            <p>
+                Używamy plików cookies, aby zapewnić Ci najlepsze doświadczenia.
+                <a href="polityka.html" target="_blank">Dowiedz się więcej</a>.
+            </p>
+
+            <div class="cookie-options">
+                <label class="cookie-label">
+                    <input type="checkbox" id="cookies-necessary" class="cookie-checkbox" checked disabled>
+                    Niezbędne (zawsze aktywne)
+                </label>
+                <label class="cookie-label">
+                    <input type="checkbox" id="cookies-analytics" class="cookie-checkbox">
+                    Analityczne
+                </label>
+                <label class="cookie-label">
+                    <input type="checkbox" id="cookies-marketing" class="cookie-checkbox">
+                    Marketingowe
+                </label>
+            </div>
+            <div class="cookie-buttons">
+                <button id="accept-necessary">Tylko niezbędne</button>
+                <button id="save-cookies">Zapisz preferencje</button>
+                <button id="accept-cookies">Akceptuję wszystkie</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2025 FitApp ZOO. Wszystkie prawa zastrzeżone.</p>
+        <p>Kontakt: <a href="mailto:fitapp.zdrowie@gmail.com">fitapp.zdrowie@gmail.com</a></p>
     </footer>
 
     <div class="banner" onclick="location.href='index.html'">

@@ -1,3 +1,4 @@
+
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -734,7 +735,6 @@ function requireRole(role) {
 ///////////////////////////////////////////////////////////////////////////
 
 
-
 // Tworzenie tabeli postów
 db.run(`
   CREATE TABLE IF NOT EXISTS posts (
@@ -775,16 +775,6 @@ app.get("/api/posts", (req, res) => {
         }
     });
 });
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -901,6 +891,38 @@ app.get('/api/userdata', (req, res) => {
     });
 });
 
+// logika cookies
+app.get('/', (req, res) => { 
+    const cookiesAccepted = req.cookies.cookiesAccepted === 'true';
+  
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+  
+// Obsługa akceptacji cookies z frontu
+app.post('/accept-cookies', (req, res) => {
+    const { analytics, marketing } = req.body;
+  
+    res.cookie('cookiesAccepted', 'true', {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      sameSite: 'Lax',
+      path: '/',
+    });
+  
+    res.cookie('analytics', analytics, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      sameSite: 'Lax',
+      path: '/',
+    });
+  
+    res.cookie('marketing', marketing, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      sameSite: 'Lax',
+      path: '/',
+    });
+  
+    res.sendStatus(200);
+});
+
 // Default route (optional)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -932,6 +954,10 @@ app.get('/blog.html', (req, res) => {
 
 app.get('/przepisy.html', (req, res) => {
     res.sendFile(path.join(__dirname, '/przepisy.html'));
+});
+
+app.get('/polityka.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '/polityka.html'));
 });
 
 app.listen(port, '0.0.0.0', () => {

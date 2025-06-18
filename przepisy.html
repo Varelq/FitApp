@@ -71,13 +71,13 @@
         <div id="recipeSuccess" style="display:none;" class="success-message"></div>
 
         <!-- Dodawanie przepisu -->
-        <button id="addRecipeBtn" type="button">Dodaj przepis</button>
+        <button class="button-rep" id="addRecipeBtn" type="button">Dodaj przepis</button>
         <div id="addRecipeModal" style="display:none;">
             <form id="addRecipeForm" class="add-recipe-form" autocomplete="off">
                 <input type="text" name="title" placeholder="Tytuł przepisu" required>
                 <textarea name="ingredients" placeholder="Składniki" required></textarea>
                 <textarea name="instructions" placeholder="Sposób przygotowania" required></textarea>
-                <button type="submit">Dodaj</button>
+                <button class="button-rep" type="submit">Dodaj</button>
             </form>
         </div>
 
@@ -87,19 +87,12 @@
         </section>
     </main>
     
-    <footer>
-        <p>&copy; 2025 FitApp ZOO. Wszystkie prawa zastrzeżone.</p>
-    </footer>
-
-    <div class="banner" onclick="location.href='index.html'">
-        FitApp – Twoja droga do zdrowego stylu życia
-    </div>
 
     <!-- Modal szczegółów przepisu -->
     <div id="recipeDetailModal" style="display:none;">
         <div class="recipe-detail-content">
-            <button id="closeDetailModal" type="button">Zamknij</button>
-            <button id="deleteRecipeBtn" type="button" style="display:none; background:#e53935; color:#fff; margin-bottom:12px;">Usuń przepis</button>
+            <button class="button-rep" id="closeDetailModal" type="button">Zamknij</button>
+            <button class="button-rep" id="deleteRecipeBtn" type="button" style="display:none; background:#e53935; color:#fff; margin-bottom:12px;">Usuń przepis</button>
             <h2 id="detailTitle"></h2>
             <p><strong>Składniki:</strong></p>
             <pre id="detailIngredients"></pre>
@@ -111,11 +104,49 @@
                 <form id="addCommentForm" class="comment-form" autocomplete="off">
                     <input type="text" name="author" placeholder="Autor (opcjonalnie)">
                     <textarea name="comment" placeholder="Dodaj komentarz..." required></textarea>
-                    <button type="submit">Dodaj komentarz</button>
+                    <button class="button-rep" type="submit">Dodaj komentarz</button>
                 </form>
             </div>
         </div>
     </div>
 
+
+    <div id="cookie-modal" class="cookie-modal hidden">
+        <div class="cookie-content">
+          <p>
+            Używamy plików cookies, aby zapewnić Ci najlepsze doświadczenia. 
+            <a href="polityka.html" target="_blank">Dowiedz się więcej</a>.
+          </p>
+      
+          <div class="cookie-options">
+              <label class="cookie-label">
+                <input type="checkbox" id="cookies-necessary" class="cookie-checkbox" checked disabled>
+                Niezbędne (zawsze aktywne)
+              </label>
+              <label class="cookie-label">
+                <input type="checkbox" id="cookies-analytics" class="cookie-checkbox">
+                Analityczne
+              </label>
+              <label class="cookie-label">
+                <input type="checkbox" id="cookies-marketing" class="cookie-checkbox">
+                Marketingowe
+              </label>
+          </div>
+          <div class="cookie-buttons">
+            <button id="accept-necessary">Tylko niezbędne</button>
+            <button id="save-cookies">Zapisz preferencje</button>
+            <button id="accept-cookies">Akceptuję wszystkie</button>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <p>&copy; 2025 FitApp ZOO. Wszystkie prawa zastrzeżone.</p>
+        <p>Kontakt: <a href="mailto:fitapp.zdrowie@gmail.com">fitapp.zdrowie@gmail.com</a></p>
+      </footer>
+    
+      <div class="banner" onclick="location.href='index.html'">
+        FitApp – Twoja droga do zdrowego stylu życia
+      </div>
 </body>
 </html>
