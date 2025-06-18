@@ -738,6 +738,7 @@ function requireRole(role) {
 
 
 // Tworzenie tabeli postów
+// Tworzenie tabeli postów
 db.run(`
   CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -748,7 +749,7 @@ db.run(`
   )
 `, (err) => {
     if (err) {
-        console.error("Błąd tworzenia tabeli:", err.message);
+        console.error("Błąd tworzenia tabeli postów:", err.message);
     } else {
         // Dodaj 3 przykładowe posty, jeśli tabela jest pusta
         db.get("SELECT COUNT(*) AS count FROM posts", (err, row) => {
@@ -767,6 +768,23 @@ db.run(`
     }
 });
 
+// Tworzenie tabeli komentarzy
+db.run(`
+  CREATE TABLE IF NOT EXISTS post_comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER NOT NULL,
+    author TEXT,
+    comment TEXT NOT NULL,
+    date TEXT NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+  )
+`, (err) => {
+    if (err) console.error("Błąd tworzenia tabeli komentarzy:", err.message);
+});
+
+// Middleware do parsowania JSON
+app.use(express.json());
+
 // API - pobierz wszystkie posty
 app.get("/api/posts", (req, res) => {
     db.all("SELECT * FROM posts ORDER BY date DESC, id DESC", (err, rows) => {
@@ -776,6 +794,41 @@ app.get("/api/posts", (req, res) => {
             res.json(rows);
         }
     });
+});
+
+// API - pobierz komentarze do posta
+app.get("/api/posts/:id/comments", (req, res) => {
+    db.all(`
+        SELECT * FROM post_comments 
+        WHERE post_id = ? 
+        ORDER BY date ASC
+    `, [req.params.id], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
+// API - dodaj komentarz do posta
+app.post("/api/posts/:id/comments", (req, res) => {
+    const { author, comment } = req.body;
+    const now = new Date().toISOString().split("T")[0];
+    
+    db.run(
+        `INSERT INTO post_comments 
+        (post_id, author, comment, date) 
+        VALUES (?, ?, ?, ?)`,
+        [req.params.id, author || "", comment, now],
+        function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
+                res.status(201).json({ id: this.lastID });
+            }
+        }
+    );
 });
 
 
