@@ -755,7 +755,7 @@ db.run(`
             if (row.count === 0) {
                 const now = new Date().toISOString().split("T")[0];
                 const samplePosts = [
-                    { title: "Pierwszy post", content: "To jest przykładowa treść pierwszego posta.", date: now, image_path: "" },
+                    { title: "Pierwszy post", content: "czy to cos zmienia", date: now, image_path: "" },
                     { title: "Drugi post", content: "Drugi post z przykładową zawartością.", date: now, image_path: "" },
                     { title: "Trzeci post", content: "Trzeci post na blogu FitApp.", date: now, image_path: "" },
                 ];
