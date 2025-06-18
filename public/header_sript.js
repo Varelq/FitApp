@@ -55,3 +55,51 @@ window.addEventListener("click", function (e) {
     dropdown.style.display = "none";
     }
 });
+
+//cookies
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+  }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('cookie-modal');
+    const acceptAllBtn = document.getElementById('accept-cookies');
+    const acceptNecessaryBtn = document.getElementById('accept-necessary');
+    const saveBtn = document.getElementById('save-cookies');
+  
+    const analyticsBox = document.getElementById('cookies-analytics');
+    const marketingBox = document.getElementById('cookies-marketing');
+  
+    if (!getCookie('cookiesAccepted')) {
+      modal.classList.remove('hidden');
+    }
+  
+    function saveConsent(analytics, marketing) {
+      fetch('/accept-cookies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          analytics: analytics,
+          marketing: marketing
+        })
+      }).then(() => {
+        modal.classList.add('hidden');
+        document.cookie = "cookiesAccepted=true; path=/; max-age=31536000";
+      });
+    }
+  
+    acceptAllBtn.addEventListener('click', () => {
+      saveConsent(true, true);
+    });
+  
+    saveBtn.addEventListener('click', () => {
+      const analytics = analyticsBox.checked;
+      const marketing = marketingBox.checked;
+      saveConsent(analytics, marketing);
+    });
+  
+    acceptNecessaryBtn.addEventListener('click', () => {
+      saveConsent(false, false);
+    });
+  });
