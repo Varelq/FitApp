@@ -658,6 +658,84 @@ function requireRole(role) {
     };
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+
+
+
+// Tworzenie tabeli postów
+db.run(`
+  CREATE TABLE IF NOT EXISTS posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    date TEXT NOT NULL,
+    image_path TEXT
+  )
+`, (err) => {
+  if (err) {
+    console.error("Błąd tworzenia tabeli:", err.message);
+  } else {
+    // Dodaj 3 przykładowe posty, jeśli tabela jest pusta
+    db.get("SELECT COUNT(*) AS count FROM posts", (err, row) => {
+      if (row.count === 0) {
+        const now = new Date().toISOString().split("T")[0];
+        const samplePosts = [
+          { title: "Pierwszy post", content: "To jest przykładowa treść pierwszego posta.", date: now, image_path: "" },
+          { title: "Drugi post", content: "Drugi post z przykładową zawartością.", date: now, image_path: "" },
+          { title: "Trzeci post", content: "Trzeci post na blogu FitApp.", date: now, image_path: "" },
+        ];
+        const stmt = db.prepare("INSERT INTO posts (title, content, date, image_path) VALUES (?, ?, ?, ?)");
+        samplePosts.forEach(p => stmt.run(p.title, p.content, p.date, p.image_path));
+        stmt.finalize(() => console.log("Dodano przykładowe posty."));
+      }
+    });
+  }
+});
+
+// API - pobierz wszystkie posty
+app.get("/api/posts", (req, res) => {
+  db.all("SELECT * FROM posts ORDER BY date DESC, id DESC", (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Serwer działa na http://localhost:${PORT}`);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////
+
 /////////BMR/////////////
 function calculateCalories({ weight, height, age, gender, activityLevel, goal }) {
     if (!weight || !height || !age || !gender || !activityLevel || !goal) {
